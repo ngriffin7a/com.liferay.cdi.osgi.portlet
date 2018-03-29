@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
-	public PortletDictionary toPortletDictionary() {
+	public Dictionary<String, Object> toDictionary() {
 
 		PortletDictionary portletDictionary = new PortletDictionary();
 

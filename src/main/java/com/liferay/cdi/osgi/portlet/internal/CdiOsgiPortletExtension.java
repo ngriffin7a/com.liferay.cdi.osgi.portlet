@@ -326,7 +326,7 @@ public class CdiOsgiPortletExtension implements Extension {
 					beanPortlet.getBeanMethods(BeanMethod.Type.INIT),
 					beanPortlet.getBeanMethods(BeanMethod.Type.RENDER),
 					beanPortlet.getBeanMethods(BeanMethod.Type.SERVE_RESOURCE)),
-				beanPortlet.toPortletDictionary());
+				beanPortlet.toDictionary());
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);

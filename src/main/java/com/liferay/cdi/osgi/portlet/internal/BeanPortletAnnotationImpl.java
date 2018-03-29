@@ -15,6 +15,7 @@
 package com.liferay.cdi.osgi.portlet.internal;
 
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -48,9 +49,10 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 	}
 
 	@Override
-	public PortletDictionary toPortletDictionary() {
+	public Dictionary<String, Object> toDictionary() {
 
-		PortletDictionary portletDictionary = super.toPortletDictionary();
+		PortletDictionary portletDictionary = (PortletDictionary) super
+			.toDictionary();
 
 		String portletName = _portletConfiguration.portletName();
 

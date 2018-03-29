@@ -14,6 +14,7 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
+import java.util.Dictionary;
 import java.util.List;
 
 /**
@@ -29,5 +30,5 @@ public interface BeanPortlet {
 
 	public String getPortletName();
 
-	public PortletDictionary toPortletDictionary();
+	public Dictionary<String, Object> toDictionary();
 }

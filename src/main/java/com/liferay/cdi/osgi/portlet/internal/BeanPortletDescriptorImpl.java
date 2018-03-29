@@ -16,11 +16,13 @@ package com.liferay.cdi.osgi.portlet.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.portlet.Portlet;
 import javax.portlet.annotations.Preference;
 
 import javax.xml.XMLConstants;
@@ -161,9 +163,10 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 	}
 
 	@Override
-	public PortletDictionary toPortletDictionary() {
+	public Dictionary<String, Object> toDictionary() {
 
-		PortletDictionary portletDictionary = super.toPortletDictionary();
+		PortletDictionary portletDictionary = (PortletDictionary) super
+			.toDictionary();
 
 		portletDictionary.putIfNotNull("javax.portlet.name", _portletName);
 
@@ -477,8 +480,8 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 	private List<String> _shortTitles = Collections.emptyList();
 	private List<Supports> _supports = Collections.emptyList();
 	private List<SupportedEvent> _supportedProcessingEvents = Collections
-			.emptyList();
+		.emptyList();
 	private List<SupportedEvent> _supportedPublishingEvents = Collections
-			.emptyList();
+		.emptyList();
 	private List<String> _titles = Collections.emptyList();
 }
