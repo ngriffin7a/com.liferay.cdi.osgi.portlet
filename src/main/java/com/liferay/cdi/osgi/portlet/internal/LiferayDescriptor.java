@@ -14,25 +14,28 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
-import java.util.Dictionary;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class LiferayDescriptor {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public void addPortletConfiguration(
+			String portletName, Map<String, String> portletConfiguration) {
+		_liferayPortletConfigurations.put(portletName, portletConfiguration);
+	}
 
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration);
+	public Map<String, String> getPortletConfiguration(String portletName) {
+		return _liferayPortletConfigurations.get(portletName);
+	}
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+	public Set<String> getPortletNames() {
+		return _liferayPortletConfigurations.keySet();
+	}
 
-	public String getPortletClass();
-
-	public String getPortletName();
-
-	public Dictionary<String, Object> toDictionary();
+	private Map<String, Map<String, String>> _liferayPortletConfigurations =
+		new HashMap<>();
 }

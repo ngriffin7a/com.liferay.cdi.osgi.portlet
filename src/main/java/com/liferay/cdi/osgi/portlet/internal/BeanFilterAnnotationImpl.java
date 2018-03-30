@@ -55,6 +55,12 @@ public class BeanFilterAnnotationImpl implements BeanFilter {
 		portletDictionary.put(
 			"service.ranking:Integer", _portletLifecycleFilter.ordinal());
 
+		Arrays.stream(_portletLifecycleFilter.initParams()).forEach(
+			initParameter ->
+				portletDictionary.putIfNotNull(
+					"javax.portlet.init-param." + initParameter.name(),
+					initParameter.value()));
+
 		return portletDictionary;
 	}
 

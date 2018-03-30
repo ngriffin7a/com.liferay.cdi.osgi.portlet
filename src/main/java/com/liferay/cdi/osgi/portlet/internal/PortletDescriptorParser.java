@@ -56,17 +56,15 @@ public class PortletDescriptorParser {
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
 		EventDefinition eventDefinition = null;
-		BeanPortletDescriptorImpl.FilterMapping filterMapping = null;
-		BeanPortletDescriptorImpl.InitParam initParam = null;
+		DescriptorFilterMapping descriptorFilterMapping = null;
+		DescriptorInitParam descriptorInitParam = null;
 		String namespaceURI = null;
-		BeanPortletDescriptorImpl.Preference preference = null;
-		BeanPortletDescriptorImpl.RoleRef roleRef = null;
-		BeanPortletDescriptorImpl.SupportedEvent supportedPublishingEvent =
-			null;
+		DescriptorPreference descriptorPreference = null;
+		DescriptorSecurityRoleRef descriptorSecurityRoleRef = null;
+		DescriptorSupportedEvent supportedPublishingEvent = null;
 		PublicRenderParam publicRenderParam = null;
-		BeanPortletDescriptorImpl.SupportedEvent supportedProcessingEvent =
-			null;
-		BeanPortletDescriptorImpl.Supports supports = null;
+		DescriptorSupportedEvent supportedProcessingEvent = null;
+		DescriptorSupports descriptorSupports = null;
 		InputStream inputStream = null;
 		XMLStreamReader xmlStreamReader = null;
 
@@ -91,35 +89,35 @@ public class PortletDescriptorParser {
 						beanFilter = new BeanFilterDescriptorImpl();
 					}
 					else if ("filter-mapping".equals(elementName)) {
-						filterMapping =
-							new BeanPortletDescriptorImpl.FilterMapping();
+						descriptorFilterMapping = new DescriptorFilterMapping();
 					}
 					else if ("init-param".equals(elementName)) {
-						initParam = new BeanPortletDescriptorImpl.InitParam();
+						descriptorInitParam = new DescriptorInitParam();
 					}
 					else if ("portlet".equals(elementName)) {
 						beanPortlet = new BeanPortletDescriptorImpl(beanApp);
 					}
 					else if ("preference".equals(elementName)) {
-						preference = new BeanPortletDescriptorImpl.Preference();
+						descriptorPreference = new DescriptorPreference();
 					}
 					else if ("public-render-parameter".equals(elementName)) {
 						publicRenderParam = new PublicRenderParamDescriptorImpl(
 							beanApp);
 					}
 					else if ("security-role-ref".equals(elementName)) {
-						roleRef = new BeanPortletDescriptorImpl.RoleRef();
+						descriptorSecurityRoleRef =
+							new DescriptorSecurityRoleRef();
 					}
 					else if ("supported-processing-event".equals(elementName)) {
 						supportedProcessingEvent =
-							new BeanPortletDescriptorImpl.SupportedEvent();
+							new DescriptorSupportedEvent();
 					}
 					else if ("supported-publishing-event".equals(elementName)) {
 						supportedPublishingEvent =
-							new BeanPortletDescriptorImpl.SupportedEvent();
+							new DescriptorSupportedEvent();
 					}
 					else if ("supports".equals(elementName)) {
-						supports = new BeanPortletDescriptorImpl.Supports();
+						descriptorSupports = new DescriptorSupports();
 					}
 				}
 				else if (eventType == XMLStreamConstants.CHARACTERS) {
@@ -193,13 +191,13 @@ public class PortletDescriptorParser {
 							String filterName = curBeanFilter.getFilterName();
 
 							if (filterName.equals(
-									filterMapping.getFilterName())) {
+									descriptorFilterMapping.getFilterName())) {
 
 								List<String> portletNames =
 									curBeanFilter.getPortletNames();
 
 								portletNames.addAll(
-									filterMapping.getPortletNames());
+									descriptorFilterMapping.getPortletNames());
 
 								found = true;
 
@@ -210,17 +208,17 @@ public class PortletDescriptorParser {
 						if (!found) {
 							throw new IOException(
 								"filter-mapping specified filter-name=" +
-								filterMapping.getFilterName() +
+								descriptorFilterMapping.getFilterName() +
 								" but there is no corresponding filter with" +
 								" that name.");
 						}
 
-						filterMapping = null;
+						descriptorFilterMapping = null;
 					}
 					else if ("filter-name".equals(elementName)) {
 
-						if (filterMapping != null) {
-							filterMapping.setFilterName(elementText);
+						if (descriptorFilterMapping != null) {
+							descriptorFilterMapping.setFilterName(elementText);
 						}
 						else if (beanFilter != null) {
 							beanFilter.setFilterName(elementText);
@@ -230,34 +228,45 @@ public class PortletDescriptorParser {
 						publicRenderParam.setIdentifier(elementText);
 					}
 					else if ("init-param".equals(elementName)) {
-						beanPortlet.addInitParam(initParam);
-						initParam = null;
+
+						if (beanFilter != null) {
+							beanFilter.addDescriptorInitParam(
+								descriptorInitParam);
+						}
+						else if (beanPortlet != null) {
+
+							{
+								beanPortlet.addInitParam(descriptorInitParam);
+							}
+
+							descriptorInitParam = null;
+						}
 					}
 					else if ("keywords".equals(elementName)) {
 						beanPortlet.addKeywords(elementText);
 					}
 					else if ("mime-type".equals(elementName)) {
-						supports.setMimeType(elementText);
+						descriptorSupports.setMimeType(elementText);
 					}
 					else if ("name".equals(elementName)) {
 
-						if (initParam != null) {
-							initParam.setName(elementText);
+						if (descriptorInitParam != null) {
+							descriptorInitParam.setName(elementText);
 						}
 						else if (publicRenderParam != null) {
 							publicRenderParam.setName(elementText);
 						}
-						else if (preference != null) {
-							preference.setName(elementText);
+						else if (descriptorPreference != null) {
+							descriptorPreference.setName(elementText);
 						}
 						else if (supportedProcessingEvent != null) {
 							supportedProcessingEvent =
-								new BeanPortletDescriptorImpl.SupportedEvent(
+								new DescriptorSupportedEvent(
 									beanApp, _getLocalPart(elementText));
 						}
 						else if (supportedPublishingEvent != null) {
 							supportedPublishingEvent =
-								new BeanPortletDescriptorImpl.SupportedEvent(
+								new DescriptorSupportedEvent(
 									beanApp, _getLocalPart(elementText));
 						}
 					}
@@ -285,16 +294,16 @@ public class PortletDescriptorParser {
 						else if (beanPortlet != null) {
 							beanPortlet.setPortletName(elementText);
 						}
-						else if (filterMapping != null) {
-							filterMapping.addPortletName(elementText);
+						else if (descriptorFilterMapping != null) {
+							descriptorFilterMapping.addPortletName(elementText);
 						}
 					}
 					else if ("portlet-mode".equals(elementName)) {
-						supports.addPortletMode(elementText);
+						descriptorSupports.addPortletMode(elementText);
 					}
 					else if ("preference".equals(elementName)) {
-						beanPortlet.addPreference(preference);
-						preference = null;
+						beanPortlet.addPreference(descriptorPreference);
+						descriptorPreference = null;
 					}
 					else if ("public-render-parameter".equals(elementName)) {
 						Map<String, PublicRenderParam> publicRenderParameterMap =
@@ -332,14 +341,15 @@ public class PortletDescriptorParser {
 						beanPortlet.setResourceBundle(elementText);
 					}
 					else if ("role-link".equals(elementName)) {
-						roleRef.setRoleLink(elementText);
+						descriptorSecurityRoleRef.setRoleLink(elementText);
 					}
 					else if ("role-name".equals(elementName)) {
-						roleRef.setRoleName(elementText);
+						descriptorSecurityRoleRef.setRoleName(elementText);
 					}
 					else if ("security-role-ref".equals(elementName)) {
-						beanPortlet.addRoleRef(roleRef);
-						roleRef = null;
+						beanPortlet.addSecurityRoleRef(
+							descriptorSecurityRoleRef);
+						descriptorSecurityRoleRef = null;
 					}
 					else if ("short-title".equals(elementName)) {
 						beanPortlet.addShortTitle(elementText);
@@ -361,26 +371,26 @@ public class PortletDescriptorParser {
 							elementText);
 					}
 					else if ("supports".equals(elementName)) {
-						beanPortlet.addSupports(supports);
-						supports = null;
+						beanPortlet.addSupports(descriptorSupports);
+						descriptorSupports = null;
 					}
 					else if ("title".equals(elementName)) {
 						beanPortlet.addTitle(elementText);
 					}
 					else if ("value".equals(elementName)) {
 
-						if (initParam != null) {
-							initParam.setValue(elementText);
+						if (descriptorInitParam != null) {
+							descriptorInitParam.setValue(elementText);
 						}
-						else if (preference != null) {
-							preference.addValue(elementText);
+						else if (descriptorPreference != null) {
+							descriptorPreference.addValue(elementText);
 						}
 					}
 					else if ("value-type".equals(elementName)) {
 						eventDefinition.setValueType(elementText);
 					}
 					else if ("window-state".equals(elementName)) {
-						supports.addWindowState(elementText);
+						descriptorSupports.addWindowState(elementText);
 					}
 				}
 			}

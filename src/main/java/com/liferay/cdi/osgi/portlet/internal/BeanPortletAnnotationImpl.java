@@ -14,9 +14,13 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
+import com.liferay.cdi.osgi.portlet.LiferayPortletConfiguration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.portlet.annotations.LocaleString;
@@ -32,10 +36,31 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 
 	public BeanPortletAnnotationImpl(
 			PortletApplication portletApplication,
-			PortletConfiguration portletConfiguration, String portletClass) {
+			PortletConfiguration portletConfiguration,
+			LiferayPortletConfiguration liferayPortletConfiguration,
+			String portletClass) {
 		super(new BeanAppAnnotationImpl(portletApplication));
 		_portletConfiguration = portletConfiguration;
 		_portletClass = portletClass;
+
+		String[] properties = null;
+
+		if (liferayPortletConfiguration != null) {
+			properties = liferayPortletConfiguration.properties();
+		}
+
+		if ((properties == null) || (properties.length == 0)) {
+			_liferayPortletConfigurationProperties = Collections.emptyMap();
+		}
+		else {
+			_liferayPortletConfigurationProperties = new HashMap<>();
+			_liferayPortletConfigurationProperties.putAll(
+				Arrays.stream(properties).map(
+					property -> PropertyMapEntryFactory.create(property))
+					.collect(
+						Collectors.toMap(
+							Map.Entry::getKey, Map.Entry::getValue)));
+		}
 	}
 
 	@Override
@@ -144,6 +169,9 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 					Arrays.stream(supports.windowStates()).collect(
 						Collectors.joining(","))).collect(Collectors.toList()));
 
+		portletDictionary.putAll(_liferayPortletConfigurationProperties);
+		portletDictionary.putAll(getParsedLiferayPortletConfiguration());
+
 		return portletDictionary;
 	}
 
@@ -168,6 +196,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 		return defaultValue;
 	}
 
+	private Map<String, String> _liferayPortletConfigurationProperties;
 	private PortletConfiguration _portletConfiguration;
 	private String _portletClass;
 }

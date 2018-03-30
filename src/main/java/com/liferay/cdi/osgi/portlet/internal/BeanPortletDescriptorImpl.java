@@ -22,12 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.portlet.Portlet;
-import javax.portlet.annotations.Preference;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-
 /**
  * @author Neil Griffin
  */
@@ -37,13 +31,13 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		super(beanApp);
 	}
 
-	public void addInitParam(InitParam initParam) {
+	public void addInitParam(DescriptorInitParam descriptorInitParam) {
 
-		if (_initParams.isEmpty()) {
-			_initParams = new ArrayList<>();
+		if (_descriptorInitParams.isEmpty()) {
+			_descriptorInitParams = new ArrayList<>();
 		}
 
-		_initParams.add(initParam);
+		_descriptorInitParams.add(descriptorInitParam);
 	}
 
 	public void addKeywords(String keywords) {
@@ -55,22 +49,23 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		_keywords.add(keywords);
 	}
 
-	public void addPreference(Preference preference) {
+	public void addPreference(DescriptorPreference descriptorPreference) {
 
-		if (_preferences.size() == 0) {
-			_preferences = new ArrayList<>();
+		if (_descriptorPreferences.size() == 0) {
+			_descriptorPreferences = new ArrayList<>();
 		}
 
-		_preferences.add(preference);
+		_descriptorPreferences.add(descriptorPreference);
 	}
 
-	public void addRoleRef(RoleRef roleRef) {
+	public void addSecurityRoleRef(
+			DescriptorSecurityRoleRef descriptorSecurityRoleRef) {
 
-		if (_roleRefs.size() == 0) {
-			_roleRefs = new ArrayList<>();
+		if (_descriptorSecurityRoleRefs.size() == 0) {
+			_descriptorSecurityRoleRefs = new ArrayList<>();
 		}
 
-		_roleRefs.add(roleRef);
+		_descriptorSecurityRoleRefs.add(descriptorSecurityRoleRef);
 	}
 
 	public void addShortTitle(String shortTitle) {
@@ -82,13 +77,14 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		_shortTitles.add(shortTitle);
 	}
 
-	public void addSupportedProcessingEvent(SupportedEvent supportedEvent) {
+	public void addSupportedProcessingEvent(
+			DescriptorSupportedEvent descriptorSupportedEvent) {
 
 		if (_supportedProcessingEvents.size() == 0) {
 			_supportedProcessingEvents = new ArrayList<>();
 		}
 
-		_supportedProcessingEvents.add(supportedEvent);
+		_supportedProcessingEvents.add(descriptorSupportedEvent);
 	}
 
 	public void addSupportedPublicRenderParamName(
@@ -101,22 +97,23 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		_supportedPublicRenderParams.add(publicRenderParamName);
 	}
 
-	public void addSupportedPublishingEvent(SupportedEvent supportedEvent) {
+	public void addSupportedPublishingEvent(
+			DescriptorSupportedEvent descriptorSupportedEvent) {
 
 		if (_supportedPublishingEvents.size() == 0) {
 			_supportedPublishingEvents = new ArrayList<>();
 		}
 
-		_supportedPublishingEvents.add(supportedEvent);
+		_supportedPublishingEvents.add(descriptorSupportedEvent);
 	}
 
-	public void addSupports(Supports supports) {
+	public void addSupports(DescriptorSupports descriptorSupports) {
 
-		if (_supports.isEmpty()) {
-			_supports = new ArrayList<>();
+		if (_descriptorSupports.isEmpty()) {
+			_descriptorSupports = new ArrayList<>();
 		}
 
-		_supports.add(supports);
+		_descriptorSupports.add(descriptorSupports);
 	}
 
 	public void addTitle(String title) {
@@ -173,11 +170,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		portletDictionary.put(
 			"javax.portlet.expiration-cache", _expirationCache);
 
-		_initParams.forEach(
-			initParam ->
+		_descriptorInitParams.forEach(
+			descriptorInitParam ->
 				portletDictionary.putIfNotNull(
-					"javax.portlet.init-param." + initParam.getName(),
-					initParam.getValue()));
+					"javax.portlet.init-param." + descriptorInitParam.getName(),
+					descriptorInitParam.getValue()));
 
 		portletDictionary.putIfNotNull(
 			"javax.portlet.description", _description);
@@ -202,7 +199,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",
-			_supports.stream().map(
+			_descriptorSupports.stream().map(
 				supports ->
 					supports.getMimeType() + ";" +
 					supports.getPortletModes().stream().collect(
@@ -212,14 +209,14 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		sb.append("<?xml version=\"1.0\"?>");
 		sb.append("<portlet-preferences>");
 
-		for (Preference preference : _preferences) {
+		for (DescriptorPreference descriptorPreference : _descriptorPreferences) {
 
 			sb.append("<preference>");
 			sb.append("<name>");
-			sb.append(preference.getName());
+			sb.append(descriptorPreference.getName());
 			sb.append("</name>");
 
-			preference.getValues().stream().forEach(
+			descriptorPreference.getValues().forEach(
 				value -> sb.append("<value>").append(value).append("</value>"));
 
 			sb.append("</preference>");
@@ -235,7 +232,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.security-role-ref",
-			_roleRefs.stream().map(
+			_descriptorSecurityRoleRefs.stream().map(
 				roleRef -> roleRef.getRoleName() + "," + roleRef.getRoleLink())
 				.collect(Collectors.toList()));
 
@@ -249,12 +246,13 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.window-state",
-			_supports.stream().map(
+			_descriptorSupports.stream().map(
 				supports ->
 					supports.getMimeType() + ";" +
 					supports.getWindowStates().stream().collect(
 						Collectors.joining(","))).collect(Collectors.toList()));
 
+		@SuppressWarnings("unchecked")
 		Set<String> supportedProcessingEvents = (Set<String>)
 			portletDictionary.get("javax.portlet.supported-processing-event");
 
@@ -273,6 +271,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			"javax.portlet.supported-processing-event",
 			supportedProcessingEvents);
 
+		@SuppressWarnings("unchecked")
 		Set<String> supportedPublishingEvents = (Set<String>)
 			portletDictionary.get("javax.portlet.supported-publishing-event");
 
@@ -291,197 +290,31 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			"javax.portlet.supported-publishing-event",
 			supportedPublishingEvents);
 
+		portletDictionary.putAll(getParsedLiferayPortletConfiguration());
+
 		return portletDictionary;
 	}
 
-	public static class FilterMapping {
-
-		public void addPortletName(String portletName) {
-
-			if (_portletNames.size() == 0) {
-				_portletNames = new ArrayList<>();
-			}
-
-			_portletNames.add(portletName);
-		}
-
-		public String getFilterName() {
-			return filterName;
-		}
-
-		public List<String> getPortletNames() {
-			return _portletNames;
-		}
-
-		public void setFilterName(String filterName) {
-			this.filterName = filterName;
-		}
-
-		private String filterName;
-		private List<String> _portletNames = Collections.emptyList();
-	}
-
-	public static class InitParam {
-
-		public String getName() {
-			return _name;
-		}
-
-		public String getValue() {
-			return _value;
-		}
-
-		public void setName(String name) {
-			_name = name;
-		}
-
-		public void setValue(String value) {
-			_value = value;
-		}
-
-		private String _name;
-		private String _value;
-	}
-
-	public static class Preference {
-
-		public void addValue(String value) {
-
-			if (_values.size() == 0) {
-				_values = new ArrayList<>();
-			}
-
-			_values.add(value);
-		}
-
-		public String getName() {
-			return _name;
-		}
-
-		public List<String> getValues() {
-			return _values;
-		}
-
-		public void setName(String name) {
-			_name = name;
-		}
-
-		private String _name;
-		private List<String> _values = Collections.emptyList();
-	}
-
-	public static class RoleRef {
-
-		public String getRoleLink() {
-			return _roleLink;
-		}
-
-		public String getRoleName() {
-			return _roleName;
-		}
-
-		public void setRoleLink(String roleLink) {
-			_roleLink = roleLink;
-		}
-
-		public void setRoleName(String roleName) {
-			_roleName = roleName;
-		}
-
-		private String _roleName = "";
-		private String _roleLink = "";
-	}
-
-	public static class SupportedEvent {
-
-		public SupportedEvent() {
-		}
-
-		public SupportedEvent(BeanApp beanApp, String name) {
-			_beanApp = beanApp;
-			_name = name;
-		}
-
-		public QName getQName() {
-
-			if ((_qName == null) && (_name != null)) {
-
-				if (_beanApp != null) {
-					return new QName(_beanApp.getDefaultNamespace(), _name);
-				}
-
-				return new QName(XMLConstants.NULL_NS_URI, _name);
-			}
-
-			return _qName;
-		}
-
-		public void setQName(QName qName) {
-			_qName = qName;
-		}
-
-		private BeanApp _beanApp;
-		private String _name;
-		private QName _qName;
-	}
-
-	public static class Supports {
-
-		public void addPortletMode(String portletMode) {
-
-			if (_portletModes.isEmpty()) {
-				_portletModes = new ArrayList<>();
-			}
-
-			_portletModes.add(portletMode);
-		}
-
-		public void addWindowState(String windowState) {
-
-			if (_windowStates.isEmpty()) {
-				_windowStates = new ArrayList<>();
-			}
-
-			_windowStates.add(windowState);
-		}
-
-		public String getMimeType() {
-			return _mimeType;
-		}
-
-		public List<String> getPortletModes() {
-			return _portletModes;
-		}
-
-		public List<String> getWindowStates() {
-			return _windowStates;
-		}
-
-		public void setMimeType(String mimeType) {
-			_mimeType = mimeType;
-		}
-
-		private List<String> _portletModes = Collections.emptyList();
-		private String _mimeType;
-		private List<String> _windowStates = Collections.emptyList();
-	}
-
 	private String _description;
+	private List<DescriptorInitParam> _descriptorInitParams = Collections
+		.emptyList();
+	private List<DescriptorSecurityRoleRef> _descriptorSecurityRoleRefs =
+		Collections.emptyList();
+	private List<DescriptorSupports> _descriptorSupports = Collections
+		.emptyList();
 	private String _displayName;
 	private int _expirationCache;
-	private List<InitParam> _initParams = Collections.emptyList();
 	private List<String> _keywords = Collections.emptyList();
 	private String _portletClass;
 	private String _portletName;
 	private List<String> _supportedPublicRenderParams = Collections.emptyList();
-	private List<Preference> _preferences = Collections.emptyList();
+	private List<DescriptorPreference> _descriptorPreferences = Collections
+		.emptyList();
 	private String _resourceBundle;
-	private List<RoleRef> _roleRefs = Collections.emptyList();
 	private List<String> _shortTitles = Collections.emptyList();
-	private List<Supports> _supports = Collections.emptyList();
-	private List<SupportedEvent> _supportedProcessingEvents = Collections
-		.emptyList();
-	private List<SupportedEvent> _supportedPublishingEvents = Collections
-		.emptyList();
+	private List<DescriptorSupportedEvent> _supportedProcessingEvents =
+		Collections.emptyList();
+	private List<DescriptorSupportedEvent> _supportedPublishingEvents =
+		Collections.emptyList();
 	private List<String> _titles = Collections.emptyList();
 }

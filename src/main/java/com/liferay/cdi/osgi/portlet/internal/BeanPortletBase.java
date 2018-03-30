@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,6 @@ import javax.xml.namespace.QName;
  * @author Neil Griffin
  */
 public abstract class BeanPortletBase implements BeanPortlet {
-
 	public BeanPortletBase(BeanApp beanApp) {
 		_beanApp = beanApp;
 	}
@@ -104,8 +104,16 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		}
 	}
 
-	public BeanApp getBeanApp() {
-		return _beanApp;
+	@Override
+	public void addParsedLiferayPortletConfiguration(
+			Map<String, String> parsedLiferayPortletConfiguration) {
+
+		if (_parsedLiferayPortletConfiguration.size() == 0) {
+			_parsedLiferayPortletConfiguration = new HashMap<>();
+		}
+
+		_parsedLiferayPortletConfiguration.putAll(
+			parsedLiferayPortletConfiguration);
 	}
 
 	@Override
@@ -219,6 +227,10 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		return portletDictionary;
 	}
 
+	protected Map<String, String> getParsedLiferayPortletConfiguration() {
+		return _parsedLiferayPortletConfiguration;
+	}
+
 	protected String getPublicRenderParameterNamespaceURI(String id) {
 
 		Map<String, PublicRenderParam> publicRenderParameterMap =
@@ -251,6 +263,8 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	private List<BeanMethod> _eventMethods = Collections.emptyList();
 	private List<BeanMethod> _headerMethods = Collections.emptyList();
 	private List<BeanMethod> _initMethods = Collections.emptyList();
+	private Map<String, String> _parsedLiferayPortletConfiguration = Collections
+		.emptyMap();
 	private List<BeanMethod> _renderMethods = Collections.emptyList();
 	private List<BeanMethod> _serveResourceMethods = Collections.emptyList();
 }

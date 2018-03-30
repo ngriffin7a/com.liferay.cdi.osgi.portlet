@@ -14,25 +14,27 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class DescriptorSecurityRoleRef {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public String getRoleLink() {
+		return _roleLink;
+	}
 
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration);
+	public String getRoleName() {
+		return _roleName;
+	}
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+	public void setRoleLink(String roleLink) {
+		_roleLink = roleLink;
+	}
 
-	public String getPortletClass();
+	public void setRoleName(String roleName) {
+		_roleName = roleName;
+	}
 
-	public String getPortletName();
-
-	public Dictionary<String, Object> toDictionary();
+	private String _roleName = "";
+	private String _roleLink = "";
 }

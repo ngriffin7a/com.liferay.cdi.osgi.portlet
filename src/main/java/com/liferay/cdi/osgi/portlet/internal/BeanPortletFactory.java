@@ -14,6 +14,7 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
+import com.liferay.cdi.osgi.portlet.LiferayPortletConfiguration;
 import javax.portlet.annotations.PortletApplication;
 import javax.portlet.annotations.PortletConfiguration;
 
@@ -23,15 +24,22 @@ import javax.portlet.annotations.PortletConfiguration;
 public class BeanPortletFactory {
 
 	public static BeanPortlet create(
-			PortletConfiguration portletConfiguration, String portletClass) {
-		return create(null, portletConfiguration, portletClass);
+			PortletConfiguration portletConfiguration,
+			LiferayPortletConfiguration liferayPortletConfiguration,
+			String portletClass) {
+		return create(
+			null, portletConfiguration, liferayPortletConfiguration,
+			portletClass);
 	}
 
 	public static BeanPortlet create(
 			PortletApplication portletApplication,
-			PortletConfiguration portletConfiguration, String portletClass) {
+			PortletConfiguration portletConfiguration,
+			LiferayPortletConfiguration liferayPortletConfiguration,
+			String portletClass) {
 		return new BeanPortletAnnotationImpl(
-			portletApplication, portletConfiguration, portletClass);
+			portletApplication, portletConfiguration,
+			liferayPortletConfiguration, portletClass);
 	}
 
 }

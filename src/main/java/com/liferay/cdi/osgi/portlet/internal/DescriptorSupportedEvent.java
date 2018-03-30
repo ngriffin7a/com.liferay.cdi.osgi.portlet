@@ -14,25 +14,41 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Map;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class DescriptorSupportedEvent {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public DescriptorSupportedEvent() {
+	}
 
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration);
+	public DescriptorSupportedEvent(BeanApp beanApp, String name) {
+		_beanApp = beanApp;
+		_name = name;
+	}
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+	public QName getQName() {
 
-	public String getPortletClass();
+		if ((_qName == null) && (_name != null)) {
 
-	public String getPortletName();
+			if (_beanApp != null) {
+				return new QName(_beanApp.getDefaultNamespace(), _name);
+			}
 
-	public Dictionary<String, Object> toDictionary();
+			return new QName(XMLConstants.NULL_NS_URI, _name);
+		}
+
+		return _qName;
+	}
+
+	public void setQName(QName qName) {
+		_qName = qName;
+	}
+
+	private BeanApp _beanApp;
+	private String _name;
+	private QName _qName;
 }

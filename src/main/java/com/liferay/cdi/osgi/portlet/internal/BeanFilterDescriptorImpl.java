@@ -15,12 +15,23 @@
 package com.liferay.cdi.osgi.portlet.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Neil Griffin
  */
 public class BeanFilterDescriptorImpl implements BeanFilter {
+
+	public void addDescriptorInitParam(
+			DescriptorInitParam descriptorInitParam) {
+
+		if (_descriptorInitParams.size() == 0) {
+			_descriptorInitParams = new ArrayList<>();
+		}
+
+		_descriptorInitParams.add(descriptorInitParam);
+	}
 
 	@Override
 	public Class<?> getFilterClass() {
@@ -61,9 +72,17 @@ public class BeanFilterDescriptorImpl implements BeanFilter {
 				"service.ranking:Integer", _ordinal.intValue());
 		}
 
+		_descriptorInitParams.forEach(
+			descriptorInitParam ->
+				portletDictionary.putIfNotNull(
+					"javax.portlet.init-param." + descriptorInitParam.getName(),
+					descriptorInitParam.getValue()));
+
 		return portletDictionary;
 	}
 
+	private List<DescriptorInitParam> _descriptorInitParams = Collections
+		.emptyList();
 	private Class<?> _filterClass;
 	private String _filterName;
 	private Integer _ordinal;

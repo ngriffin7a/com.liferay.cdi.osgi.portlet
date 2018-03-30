@@ -14,6 +14,8 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
+import com.liferay.cdi.osgi.portlet.LiferayPortletConfiguration;
+import com.liferay.cdi.osgi.portlet.LiferayPortletConfigurations;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
@@ -24,7 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -87,21 +89,24 @@ public class CdiOsgiPortletExtension implements Extension {
 
 		Bundle bundle = bundleContext.getBundle();
 
-		URL url = bundle.getEntry("/WEB-INF/portlet.xml");
+		URL portletDescriptorURL = bundle.getEntry("/WEB-INF/portlet.xml");
 
-		try {
-			PortletDescriptor portletDescriptor = PortletDescriptorParser.parse(
-				url);
+		if (portletDescriptorURL != null) {
 
-			_beanFilters.addAll(portletDescriptor.getBeanFilters());
+			try {
+				PortletDescriptor portletDescriptor = PortletDescriptorParser
+					.parse(portletDescriptorURL);
 
-			portletDescriptor.getBeanPortlets().forEach(
-				beanPortlet ->
-					_beanPortlets.put(
-						beanPortlet.getPortletName(), beanPortlet));
-		}
-		catch (Exception e) {
-			_log.error(e.getMessage(), e);
+				_beanFilters.addAll(portletDescriptor.getBeanFilters());
+
+				portletDescriptor.getBeanPortlets().forEach(
+					beanPortlet ->
+						_beanPortlets.put(
+							beanPortlet.getPortletName(), beanPortlet));
+			}
+			catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
 		}
 
 		_portletConfigurationsClasses.forEach(
@@ -125,6 +130,37 @@ public class CdiOsgiPortletExtension implements Extension {
 						annotatedClass.getAnnotation(
 							PortletLifecycleFilter.class))).collect(
 				Collectors.toList()));
+
+		URL liferayDescriptorURL = bundle.getEntry(
+			"WEB-INF/liferay-portlet.xml");
+
+		if (liferayDescriptorURL != null) {
+
+			try {
+				LiferayDescriptor liferayDescriptor = LiferayDescriptorParser
+					.parse(liferayDescriptorURL);
+
+				liferayDescriptor.getPortletNames().stream().peek(
+					portletName -> {
+
+						if (!_beanPortlets.containsKey(portletName)) {
+							_log.error(
+								"liferay-portlet.xml specifies <portlet-name>" +
+								"{}</portlet-name> but there is no such name " +
+								"specified in portlet.xml or in " +
+								"@PortletConfiguration", portletName);
+						}
+					}).map(portletName -> _beanPortlets.get(portletName))
+					.filter(Objects::nonNull).forEach(
+					beanPortlet ->
+						beanPortlet.addParsedLiferayPortletConfiguration(
+							liferayDescriptor.getPortletConfiguration(
+								beanPortlet.getPortletName())));
+			}
+			catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
+		}
 	}
 
 	public void applicationScopedInitialized(
@@ -145,15 +181,17 @@ public class CdiOsgiPortletExtension implements Extension {
 			CdiOsgiPortletExtension.class).getBundleContext();
 
 		_portletRegistrations = _beanPortlets.entrySet().stream().map(
-			entry -> registerBeanPortlet(bundleContext, entry.getValue()))
-				.collect(Collectors.toList());
+			entry ->
+				RegistrationUtil.registerBeanPortlet(
+					bundleContext, entry.getValue())).collect(
+				Collectors.toList());
 
 		_beanFilters.stream().forEach(
 			beanFilter ->
 				beanFilter.getPortletNames().stream().forEach(
 					portletName ->
 						_filterRegistrations.addAll(
-							registerBeanFilter(
+							RegistrationUtil.registerBeanFilter(
 								bundleContext, portletName,
 								_beanPortlets.keySet(), beanFilter,
 								beanManager))));
@@ -201,6 +239,20 @@ public class CdiOsgiPortletExtension implements Extension {
 
 		if (portletLifecycleFilter != null) {
 			_portletLifecycleFilterClasses.add(annotatedClass);
+		}
+
+		LiferayPortletConfigurations liferayPortletConfigurations =
+			annotatedClass.getAnnotation(LiferayPortletConfigurations.class);
+
+		if (liferayPortletConfigurations != null) {
+			_liferayPortletConfigurationsClasses.add(annotatedClass);
+		}
+
+		LiferayPortletConfiguration liferayPortletConfiguration =
+			annotatedClass.getAnnotation(LiferayPortletConfiguration.class);
+
+		if (liferayPortletConfiguration != null) {
+			_liferayPortletConfigurationClasses.add(annotatedClass);
 		}
 	}
 
@@ -253,86 +305,24 @@ public class CdiOsgiPortletExtension implements Extension {
 			}
 			else {
 
-				Arrays.stream(portletNames).filter(
+				Arrays.stream(portletNames).peek(
+					portletName -> {
+
+						if (!_beanPortlets.containsKey(portletName)) {
+							_log.error(
+								"No portlet named \"" + portletName +
+								"\" was registered via @PortletConfiguration " +
+								"for @RenderMethod " + clazz.getName() + "." +
+								method.getName());
+						}
+					}).filter(
 					portletName -> _beanPortlets.containsKey(portletName))
 					.forEach(
 						portletName ->
 							_beanPortlets.get(portletName).addBeanMethod(
 								beanMethod));
-
-				Arrays.stream(portletNames).filter(
-					portletName -> !_beanPortlets.containsKey(portletName))
-					.forEach(
-						portletName ->
-							_log.error(
-								"No portlet named \"" + portletName +
-								"\" was registered via @PortletConfiguration " +
-								"for @RenderMethod " + clazz.getName() + "." +
-								method.getName()));
 			}
 		}
-	}
-
-	protected List<ServiceRegistration<PortletFilter>> registerBeanFilter(
-			BundleContext bundleContext, String portletName,
-			Set<String> allPortletNames, BeanFilter beanFilter,
-			BeanManager beanManager) {
-
-		List<ServiceRegistration<PortletFilter>> registrations =
-			new ArrayList<>();
-
-		System.err.println(
-			"!@#$ REGISTERING BEAN FILTER: filterName=" +
-			beanFilter.getFilterName() + " portletName=" + portletName);
-
-		if ("*".equals(portletName)) {
-			allPortletNames.forEach(
-				curPortletName ->
-					registrations.add(
-						bundleContext.registerService(
-							PortletFilter.class,
-							new CdiOsgiFilterInvoker(
-								beanFilter.getFilterClass(), beanManager),
-							beanFilter.toDictionary(curPortletName))));
-		}
-		else {
-			registrations.add(
-				bundleContext.registerService(
-					PortletFilter.class,
-					new CdiOsgiFilterInvoker(
-						beanFilter.getFilterClass(), beanManager),
-					beanFilter.toDictionary(portletName)));
-		}
-
-		return registrations;
-	}
-
-	protected ServiceRegistration<Portlet> registerBeanPortlet(
-			BundleContext bundleContext, BeanPortlet beanPortlet) {
-
-		try {
-
-			System.err.println(
-				"!@#$ REGISTERING BEAN PORTLET: portletName=" +
-				beanPortlet.getPortletName());
-
-			return bundleContext.registerService(
-				Portlet.class,
-				new CdiOsgiPortletInvoker(
-					beanPortlet.getBeanMethods(BeanMethod.Type.ACTION),
-					beanPortlet.getBeanMethods(BeanMethod.Type.DESTROY),
-					beanPortlet.getBeanMethods(BeanMethod.Type.EVENT),
-					beanPortlet.getBeanMethods(BeanMethod.Type.HEADER),
-					beanPortlet.getBeanMethods(BeanMethod.Type.INIT),
-					beanPortlet.getBeanMethods(BeanMethod.Type.RENDER),
-					beanPortlet.getBeanMethods(BeanMethod.Type.SERVE_RESOURCE)),
-				beanPortlet.toDictionary());
-		}
-		catch (Exception e) {
-			_log.error(e.getMessage(), e);
-		}
-
-		return null;
 	}
 
 	protected List<ScannedMethod> scanMethods(
@@ -348,6 +338,39 @@ public class CdiOsgiPortletExtension implements Extension {
 			.collect(Collectors.toList());
 	}
 
+	private LiferayPortletConfiguration getLiferayPortletConfiguration(
+			String portletName) {
+
+		for (Class<?> annotatedClass : _liferayPortletConfigurationClasses) {
+
+			LiferayPortletConfiguration liferayPortletConfiguration =
+				annotatedClass.getAnnotation(LiferayPortletConfiguration.class);
+
+			if (portletName.equals(liferayPortletConfiguration.portletName())) {
+				return liferayPortletConfiguration;
+			}
+		}
+
+		for (Class<?> annotatedClass : _liferayPortletConfigurationsClasses) {
+
+			LiferayPortletConfigurations liferayPortletConfigurations =
+				annotatedClass.getAnnotation(
+					LiferayPortletConfigurations.class);
+
+			for (
+				LiferayPortletConfiguration liferayPortletConfiguration :
+				liferayPortletConfigurations.value()) {
+
+				if (portletName.equals(
+						liferayPortletConfiguration.portletName())) {
+					return liferayPortletConfiguration;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	private void scanBeanPortlet(
 			Class<?> annotatedClass,
 			PortletConfiguration portletConfiguration) {
@@ -361,7 +384,9 @@ public class CdiOsgiPortletExtension implements Extension {
 				_beanPortlets.put(
 					configuredPortletName,
 					BeanPortletFactory.create(
-						portletConfiguration, annotatedClass.getName()));
+						portletConfiguration,
+						getLiferayPortletConfiguration(configuredPortletName),
+						annotatedClass.getName()));
 			}
 			else {
 				_beanPortlets.put(
@@ -369,6 +394,7 @@ public class CdiOsgiPortletExtension implements Extension {
 					BeanPortletFactory.create(
 						_portletApplicationClass.getAnnotation(
 							PortletApplication.class), portletConfiguration,
+						getLiferayPortletConfiguration(configuredPortletName),
 						annotatedClass.getName()));
 			}
 		}
@@ -534,6 +560,10 @@ public class CdiOsgiPortletExtension implements Extension {
 	private List<ScannedMethod> _headerMethods = new ArrayList<>();
 	private List<ScannedMethod> _initMethods = new ArrayList<>();
 	private Class<?> _portletApplicationClass;
+	private List<Class<?>> _liferayPortletConfigurationClasses =
+		new ArrayList<>();
+	private List<Class<?>> _liferayPortletConfigurationsClasses =
+		new ArrayList<>();
 	private List<Class<?>> _portletConfigurationClasses = new ArrayList<>();
 	private List<Class<?>> _portletConfigurationsClasses = new ArrayList<>();
 	private List<Class<?>> _portletLifecycleFilterClasses = new ArrayList<>();

@@ -14,25 +14,27 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class DescriptorInitParam {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public String getName() {
+		return _name;
+	}
 
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration);
+	public String getValue() {
+		return _value;
+	}
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+	public void setName(String name) {
+		_name = name;
+	}
 
-	public String getPortletClass();
+	public void setValue(String value) {
+		_value = value;
+	}
 
-	public String getPortletName();
-
-	public Dictionary<String, Object> toDictionary();
+	private String _name;
+	private String _value;
 }

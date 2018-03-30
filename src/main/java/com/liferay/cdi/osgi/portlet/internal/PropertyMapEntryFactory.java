@@ -14,25 +14,26 @@
 
 package com.liferay.cdi.osgi.portlet.internal;
 
-import java.util.Dictionary;
-import java.util.List;
+import java.util.AbstractMap;
 import java.util.Map;
 
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class PropertyMapEntryFactory {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public static Map.Entry<String, String> create(String property) {
 
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration);
+		String name = property;
+		String value = null;
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+		int equalsPos = property.indexOf("=");
 
-	public String getPortletClass();
+		if (equalsPos > 0) {
+			name = property.substring(0, equalsPos);
+			value = property.substring(equalsPos + 1);
+		}
 
-	public String getPortletName();
-
-	public Dictionary<String, Object> toDictionary();
+		return new AbstractMap.SimpleEntry<>(name, value);
+	}
 }

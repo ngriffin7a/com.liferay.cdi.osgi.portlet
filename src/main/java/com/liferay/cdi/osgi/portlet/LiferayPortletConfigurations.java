@@ -21,29 +21,18 @@ import java.lang.annotation.Target;
 
 /**
  * This is an annotation that provides a way to specify the Liferay-specific
- * configuration for a single portlet.
+ * configuration for multiple portlets.
  *
  * @author Neil Griffin
  */
 @Retention(RUNTIME)
 @Target({TYPE})
-public @interface LiferayPortletConfiguration {
+public @interface LiferayPortletConfigurations {
 
 	/**
-	 * The portlet name that the portlet configuration is associated with.
+	 * An array of Liferay portlet configurations.
 	 *
-	 * @return The portlet name that the portlet configuration is associated
-	 * with.
+	 * @return An array of Liferay portlet configurations.
 	 */
-	public String portletName();
-
-	/**
-	 * The Liferay-specific portlet configuration. For more information see the
-	 * documentation regarding the <a
-	 * href="https://dev.liferay.com/develop/reference/-/knowledge_base/7-0/portlet-descriptor-to-osgi-service-property-map">
-	 * Portlet Descriptor to OSGi Service Property Map</a>.
-	 *
-	 * @return The Liferay-specific portlet configuration.
-	 */
-	public String[] properties() default {};
+	LiferayPortletConfiguration[] value();
 }
