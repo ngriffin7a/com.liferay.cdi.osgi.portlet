@@ -15,9 +15,7 @@
 package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.portal.kernel.model.PortletConstants;
-import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,21 +83,6 @@ public class RegistrationUtil {
 
 			String portletId = getPortletId(
 				beanPortlet.getPortletName(), servletContextName);
-
-			if (portletId.length() >
-				PortletIdCodec.PORTLET_INSTANCE_KEY_MAX_LENGTH) {
-
-				// LPS-32878
-
-				_log.error(
-					StringBundler.concat(
-						"Portlet ID ", portletId, " has more than ",
-						String.valueOf(
-							PortletIdCodec.PORTLET_INSTANCE_KEY_MAX_LENGTH),
-						" characters"));
-
-				return null;
-			}
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Registering bean portletId: " + portletId);
