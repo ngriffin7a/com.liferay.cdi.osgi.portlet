@@ -6,18 +6,17 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.liferay</groupId>
-	<artifactId>com.liferay.cdi</artifactId>
+	<groupId>com.liferay.portal</groupId>
+	<artifactId>com.liferay.bean.portlet.parent</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>liferay-cdi-parent</name>
+	<name>liferay-bean-portlet-parent</name>
 
 	<url>http://www.liferay.com</url>
 
 	<modules>
-		<module>cdi-bean-producer</module>
-		<module>cdi-osgi-registration</module>
-		<module>cdi-demo1-portlet</module>
+		<module>bean-portlet-extension</module>
+		<module>bean-demo1-portlet</module>
 	</modules>
 
 	<build>
