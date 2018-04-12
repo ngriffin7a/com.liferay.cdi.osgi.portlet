@@ -1,1 +1,1 @@
-com.liferay.cdi.osgi.portlet.internal.BeanPortletExtension
+com.liferay.bean.portlet.extension.internal.BeanPortletExtension
