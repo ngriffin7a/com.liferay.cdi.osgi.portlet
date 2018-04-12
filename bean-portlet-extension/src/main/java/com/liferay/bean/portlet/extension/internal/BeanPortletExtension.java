@@ -233,7 +233,7 @@ public class BeanPortletExtension implements Extension {
 									RegistrationUtil.registerBeanFilter(
 										bundleContext, portletName,
 										_beanPortlets.keySet(), beanFilter,
-										beanManager))));
+										beanManager, servletContextName))));
 
 	}
 

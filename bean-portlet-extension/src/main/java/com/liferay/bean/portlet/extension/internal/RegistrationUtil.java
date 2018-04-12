@@ -42,14 +42,18 @@ public class RegistrationUtil {
 	public static List<ServiceRegistration<PortletFilter>> registerBeanFilter(
 			BundleContext bundleContext, String portletName,
 			Set<String> allPortletNames, BeanFilter beanFilter,
-			BeanManager beanManager) {
+			BeanManager beanManager, String servletContextName) {
 
 		List<ServiceRegistration<PortletFilter>> registrations =
 			new ArrayList<>();
 
-		System.err.println(
-			"!@#$ REGISTERING BEAN FILTER: filterName=" +
-			beanFilter.getFilterName() + " portletName=" + portletName);
+		String portletId = getPortletId(portletName, servletContextName);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Registering bean filter: " + beanFilter.getFilterName() +
+				" for portletId: " + portletId);
+		}
 
 		if ("*".equals(portletName)) {
 			allPortletNames.forEach(
@@ -79,14 +83,8 @@ public class RegistrationUtil {
 
 		try {
 
-			String portletId = beanPortlet.getPortletName();
-
-			if (Validator.isNotNull(servletContextName)) {
-				portletId = portletId.concat(PortletConstants.WAR_SEPARATOR)
-					.concat(servletContextName);
-			}
-
-			portletId = PortalUtil.getJsSafePortletId(portletId);
+			String portletId = getPortletId(
+				beanPortlet.getPortletName(), servletContextName);
 
 			if (portletId.length() >
 				PortletIdCodec.PORTLET_INSTANCE_KEY_MAX_LENGTH) {
@@ -103,7 +101,9 @@ public class RegistrationUtil {
 				return null;
 			}
 
-			_log.debug("Registering bean portlet: " + portletId);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Registering bean portletId: " + portletId);
+			}
 
 			return bundleContext.registerService(
 				Portlet.class,
@@ -122,6 +122,19 @@ public class RegistrationUtil {
 		}
 
 		return null;
+	}
+
+	private static String getPortletId(
+			String portletName, String servletContextName) {
+
+		String portletId = portletName;
+
+		if (Validator.isNotNull(servletContextName)) {
+			portletId = portletId.concat(PortletConstants.WAR_SEPARATOR)
+				.concat(servletContextName);
+		}
+
+		return PortalUtil.getJsSafePortletId(portletId);
 	}
 
 	private static final Logger _log = LoggerFactory.getLogger(
