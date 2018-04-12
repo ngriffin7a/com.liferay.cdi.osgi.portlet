@@ -14,6 +14,11 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -74,9 +79,31 @@ public class RegistrationUtil {
 
 		try {
 
-			System.err.println(
-				"!@#$ REGISTERING BEAN PORTLET: portletName=" +
-				beanPortlet.getPortletName());
+			String portletId = beanPortlet.getPortletName();
+
+			if (Validator.isNotNull(servletContextName)) {
+				portletId = portletId.concat(PortletConstants.WAR_SEPARATOR)
+					.concat(servletContextName);
+			}
+
+			portletId = PortalUtil.getJsSafePortletId(portletId);
+
+			if (portletId.length() >
+				PortletIdCodec.PORTLET_INSTANCE_KEY_MAX_LENGTH) {
+
+				// LPS-32878
+
+				_log.error(
+					StringBundler.concat(
+						"Portlet ID ", portletId, " has more than ",
+						String.valueOf(
+							PortletIdCodec.PORTLET_INSTANCE_KEY_MAX_LENGTH),
+						" characters"));
+
+				return null;
+			}
+
+			_log.debug("Registering bean portlet: " + portletId);
 
 			return bundleContext.registerService(
 				Portlet.class,
@@ -88,7 +115,7 @@ public class RegistrationUtil {
 					beanPortlet.getBeanMethods(BeanMethod.Type.INIT),
 					beanPortlet.getBeanMethods(BeanMethod.Type.RENDER),
 					beanPortlet.getBeanMethods(BeanMethod.Type.SERVE_RESOURCE)),
-				beanPortlet.toDictionary(servletContextName));
+				beanPortlet.toDictionary(portletId));
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);
