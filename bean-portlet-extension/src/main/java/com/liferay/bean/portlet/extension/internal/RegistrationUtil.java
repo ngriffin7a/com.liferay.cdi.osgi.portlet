@@ -69,7 +69,8 @@ public class RegistrationUtil {
 	}
 
 	public static ServiceRegistration<Portlet> registerBeanPortlet(
-			BundleContext bundleContext, BeanPortlet beanPortlet) {
+			BundleContext bundleContext, BeanPortlet beanPortlet,
+			String servletContextName) {
 
 		try {
 
@@ -87,7 +88,7 @@ public class RegistrationUtil {
 					beanPortlet.getBeanMethods(BeanMethod.Type.INIT),
 					beanPortlet.getBeanMethods(BeanMethod.Type.RENDER),
 					beanPortlet.getBeanMethods(BeanMethod.Type.SERVE_RESOURCE)),
-				beanPortlet.toDictionary());
+				beanPortlet.toDictionary(servletContextName));
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);

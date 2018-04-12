@@ -82,6 +82,7 @@ import javax.portlet.annotations.ServeResourceMethod;
 import javax.portlet.annotations.WindowId;
 import javax.portlet.filter.PortletFilter;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 import org.osgi.framework.Bundle;
@@ -195,7 +196,7 @@ public class BeanPortletExtension implements Extension {
 	public void applicationScopedInitialized(
 			@Observes
 			@Initialized(ApplicationScoped.class)
-			Object ignore, BeanManager beanManager) {
+			ServletContext servletContext, BeanManager beanManager) {
 
 		associateMethods(beanManager, BeanMethod.Type.ACTION, _actionMethods);
 		associateMethods(beanManager, BeanMethod.Type.DESTROY, _destroyMethods);
@@ -210,12 +211,15 @@ public class BeanPortletExtension implements Extension {
 				BeanPortletExtension.class)
 				.getBundleContext();
 
+		String servletContextName = servletContext.getServletContextName();
+
 		_portletRegistrations = _beanPortlets.entrySet()
 			.stream()
 				.map(
 						entry ->
 							RegistrationUtil.registerBeanPortlet(
-								bundleContext, entry.getValue()))
+								bundleContext, entry.getValue(),
+								servletContextName))
 				.collect(Collectors.toList());
 
 		_beanFilters.stream()

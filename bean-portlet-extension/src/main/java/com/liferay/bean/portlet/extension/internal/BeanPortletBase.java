@@ -14,6 +14,11 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.exception.PortletIdException;
+import com.liferay.portal.kernel.model.PortletConstants;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
@@ -143,7 +148,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
-	public Dictionary<String, Object> toDictionary() {
+	public Dictionary<String, Object> toDictionary(String servletContextName) {
 
 		PortletDictionary portletDictionary = new PortletDictionary();
 
@@ -232,6 +237,19 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 	protected Map<String, String> getParsedLiferayPortletConfiguration() {
 		return _parsedLiferayPortletConfiguration;
+	}
+
+	protected String getPortletId(
+			String portletName, String servletContextName) {
+
+		String portletId = portletName;
+
+		if (Validator.isNotNull(servletContextName)) {
+			portletId = portletId.concat(PortletConstants.WAR_SEPARATOR)
+				.concat(servletContextName);
+		}
+
+		return PortalUtil.getJsSafePortletId(portletId);
 	}
 
 	protected String getPublicRenderParameterNamespaceURI(String id) {

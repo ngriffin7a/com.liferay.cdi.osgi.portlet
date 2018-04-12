@@ -34,5 +34,5 @@ public interface BeanPortlet {
 
 	public String getPortletName();
 
-	public Dictionary<String, Object> toDictionary();
+	public Dictionary<String, Object> toDictionary(String servletContextName);
 }

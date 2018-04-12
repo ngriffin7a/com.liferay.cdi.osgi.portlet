@@ -75,14 +75,16 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 	}
 
 	@Override
-	public Dictionary<String, Object> toDictionary() {
+	public Dictionary<String, Object> toDictionary(String servletContextName) {
 
 		PortletDictionary portletDictionary = (PortletDictionary) super
-			.toDictionary();
+			.toDictionary(servletContextName);
 
 		String portletName = _portletConfiguration.portletName();
 
-		portletDictionary.putIfNotNull("javax.portlet.name", portletName);
+		portletDictionary.putIfNotNull(
+			"javax.portlet.name",
+			getPortletId(portletName, servletContextName));
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache",
