@@ -14,12 +14,6 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
-import com.liferay.portal.kernel.exception.PortletIdException;
-import com.liferay.portal.kernel.model.PortletConstants;
-import com.liferay.portal.kernel.portlet.PortletIdCodec;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.Validator;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
@@ -50,9 +44,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	@Override
 	public void addBeanMethod(BeanMethod beanMethod) {
 
-		BeanMethod.Type beanMethodType = beanMethod.getType();
+		MethodType methodType = beanMethod.getType();
 
-		if (beanMethodType == BeanMethod.Type.ACTION) {
+		if (methodType == MethodType.ACTION) {
 
 			if (_actionMethods.isEmpty()) {
 				_actionMethods = new ArrayList<>();
@@ -60,7 +54,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 			_actionMethods.add(beanMethod);
 		}
-		else if (beanMethodType == BeanMethod.Type.DESTROY) {
+		else if (methodType == MethodType.DESTROY) {
 
 			if (_destroyMethods.isEmpty()) {
 				_destroyMethods = new ArrayList<>();
@@ -68,7 +62,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 			_destroyMethods.add(beanMethod);
 		}
-		else if (beanMethodType == BeanMethod.Type.EVENT) {
+		else if (methodType == MethodType.EVENT) {
 
 			if (_eventMethods.isEmpty()) {
 				_eventMethods = new ArrayList<>();
@@ -76,7 +70,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 			_eventMethods.add(beanMethod);
 		}
-		else if (beanMethodType == BeanMethod.Type.HEADER) {
+		else if (methodType == MethodType.HEADER) {
 
 			if (_headerMethods.isEmpty()) {
 				_headerMethods = new ArrayList<>();
@@ -84,7 +78,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 			_headerMethods.add(beanMethod);
 		}
-		else if (beanMethodType == BeanMethod.Type.INIT) {
+		else if (methodType == MethodType.INIT) {
 
 			if (_initMethods.isEmpty()) {
 				_initMethods = new ArrayList<>();
@@ -92,7 +86,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 			_initMethods.add(beanMethod);
 		}
-		else if (beanMethodType == BeanMethod.Type.RENDER) {
+		else if (methodType == MethodType.RENDER) {
 
 			if (_renderMethods.isEmpty()) {
 				_renderMethods = new ArrayList<>();
@@ -123,24 +117,24 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType) {
+	public List<BeanMethod> getBeanMethods(MethodType methodType) {
 
-		if (beanMethodType == BeanMethod.Type.ACTION) {
+		if (methodType == MethodType.ACTION) {
 			return _actionMethods;
 		}
-		else if (beanMethodType == BeanMethod.Type.DESTROY) {
+		else if (methodType == MethodType.DESTROY) {
 			return _destroyMethods;
 		}
-		else if (beanMethodType == BeanMethod.Type.EVENT) {
+		else if (methodType == MethodType.EVENT) {
 			return _eventMethods;
 		}
-		else if (beanMethodType == BeanMethod.Type.HEADER) {
+		else if (methodType == MethodType.HEADER) {
 			return _headerMethods;
 		}
-		else if (beanMethodType == BeanMethod.Type.INIT) {
+		else if (methodType == MethodType.INIT) {
 			return _initMethods;
 		}
-		else if (beanMethodType == BeanMethod.Type.RENDER) {
+		else if (methodType == MethodType.RENDER) {
 			return _renderMethods;
 		}
 		else {
@@ -149,11 +143,13 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
-	public Dictionary<String, Object> toDictionary(String servletContextName) {
+	public Dictionary<String, Object> toDictionary(String portletId) {
 
 		PortletDictionary portletDictionary = new PortletDictionary();
 
-		for (BeanMethod beanMethod : getBeanMethods(BeanMethod.Type.ACTION)) {
+		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
+
+		for (BeanMethod beanMethod : getBeanMethods(MethodType.ACTION)) {
 
 			Set<String> supportedPublishingEvents = (Set<String>)
 				portletDictionary.get(
@@ -182,7 +178,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 				supportedPublishingEvents);
 		}
 
-		for (BeanMethod beanMethod : getBeanMethods(BeanMethod.Type.EVENT)) {
+		for (BeanMethod beanMethod : getBeanMethods(MethodType.EVENT)) {
 
 			Set<String> supportedPublishingEvents = (Set<String>)
 				portletDictionary.get(
@@ -232,6 +228,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 				"javax.portlet.supported-processing-event",
 				supportedProcessingEvents);
 		}
+
+		portletDictionary.put(
+			"javax.portlet.version", _beanApp.getSpecVersion());
 
 		return portletDictionary;
 	}

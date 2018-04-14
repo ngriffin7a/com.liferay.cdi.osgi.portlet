@@ -14,24 +14,11 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import javax.portlet.annotations.PortletApplication;
 
 /**
  * @author Neil Griffin
  */
-public interface BeanMethod {
-
-	public Class<?> getBeanClass();
-
-	public Method getMethod();
-
-	public int getOrdinal();
-
-	public String[] getPortletNames();
-
-	public MethodType getType();
-
-	public void invoke(Object... args) throws InvocationTargetException,
-		IllegalAccessException;
+@PortletApplication
+public class DefaultPortletApplication {
 }

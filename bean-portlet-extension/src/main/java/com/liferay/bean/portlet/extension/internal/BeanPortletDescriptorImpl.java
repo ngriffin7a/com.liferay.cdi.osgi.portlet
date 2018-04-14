@@ -165,8 +165,6 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		PortletDictionary portletDictionary = (PortletDictionary) super
 			.toDictionary(portletId);
 
-		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
-
 		portletDictionary.put(
 			"javax.portlet.expiration-cache", _expirationCache);
 

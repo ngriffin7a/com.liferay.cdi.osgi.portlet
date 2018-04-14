@@ -22,6 +22,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.annotations.PortletApplication;
+
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -46,10 +48,12 @@ public class PortletDescriptorParser {
 		PortletDescriptor portletDescriptor = new PortletDescriptor();
 		List<BeanFilter> beanFilters = portletDescriptor.getBeanFilters();
 		List<BeanPortlet> beanPortlets = portletDescriptor.getBeanPortlets();
-		BeanApp beanApp = new BeanAppDecriptorImpl();
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
 
-		_validateXML(xmlInputFactory, portletDescriptorURL);
+		String specVersion = _validateXML(
+			xmlInputFactory, portletDescriptorURL);
+
+		BeanApp beanApp = new BeanAppDecriptorImpl(specVersion);
 
 		String elementName;
 		String elementText = null;
@@ -479,33 +483,6 @@ public class PortletDescriptorParser {
 		return descriptorAttribute;
 	}
 
-	private static int _getDescriptorMajorVersion(
-			XMLInputFactory xmlInputFactory, URL portletDescriptorURL)
-		throws IOException, XMLStreamException {
-
-		String descriptorVersion = _getDescriptorAttribute(
-			xmlInputFactory, portletDescriptorURL, "version");
-
-		if (descriptorVersion == null) {
-			return 3;
-		}
-
-		try {
-			descriptorVersion = descriptorVersion.trim();
-
-			int pos = descriptorVersion.indexOf(".");
-
-			if (pos > 0) {
-				descriptorVersion = descriptorVersion.substring(0, pos);
-			}
-
-			return Integer.parseInt(descriptorVersion);
-		}
-		catch (NumberFormatException e) {
-			throw new XMLStreamException(e);
-		}
-	}
-
 	private static String _getDescriptorSchemaURL(
 			XMLInputFactory xmlInputFactory, URL portletDescriptorURL)
 		throws IOException, XMLStreamException {
@@ -530,6 +507,20 @@ public class PortletDescriptorParser {
 		}
 
 		return descriptorSchemaURL;
+	}
+
+	private static String _getDescriptorVersion(
+			XMLInputFactory xmlInputFactory, URL portletDescriptorURL,
+			String defaultValue) throws IOException, XMLStreamException {
+
+		String descriptorVersion = _getDescriptorAttribute(
+			xmlInputFactory, portletDescriptorURL, "version");
+
+		if (descriptorVersion == null) {
+			return defaultValue;
+		}
+
+		return descriptorVersion;
 	}
 
 	private static String _getLocalPart(String name) {
@@ -558,18 +549,25 @@ public class PortletDescriptorParser {
 		return prefix;
 	}
 
-	private static void _validateXML(
+	private static String _validateXML(
 			XMLInputFactory xmlInputFactory, URL portletDescriptorURL)
 		throws IOException, SAXException, XMLStreamException {
+
+		PortletApplication defaultPortletApplication =
+			DefaultPortletApplication.class.getAnnotation(
+				PortletApplication.class);
+
+		String descriptorVersion = defaultPortletApplication.version();
 
 		String descriptorSchemaURL = _getDescriptorSchemaURL(
 			xmlInputFactory, portletDescriptorURL);
 
 		if (descriptorSchemaURL == null) {
-			int descriptorVersion = _getDescriptorMajorVersion(
-				xmlInputFactory, portletDescriptorURL);
+			descriptorVersion = _getDescriptorVersion(
+				xmlInputFactory, portletDescriptorURL, descriptorVersion);
 
-			if (descriptorVersion == 2) {
+			if ((descriptorVersion != null) &&
+				descriptorVersion.startsWith("2")) {
 				descriptorSchemaURL =
 					"http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd";
 			}
@@ -613,6 +611,8 @@ public class PortletDescriptorParser {
 
 		xmlStreamReader.close();
 		inputStream.close();
+
+		return descriptorVersion;
 	}
 
 }

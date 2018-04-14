@@ -24,6 +24,10 @@ import java.util.Map;
  */
 public class BeanAppDecriptorImpl extends BeanAppBase {
 
+	public BeanAppDecriptorImpl(String specVersion) {
+		_specVersion = specVersion;
+	}
+
 	@Override
 	public List<EventDefinition> getEventDefinitions() {
 		return _eventDefinitions;
@@ -34,7 +38,13 @@ public class BeanAppDecriptorImpl extends BeanAppBase {
 		return _publicRenderParamMap;
 	}
 
+	@Override
+	public String getSpecVersion() {
+		return _specVersion;
+	}
+
 	private List<EventDefinition> _eventDefinitions = new ArrayList<>();
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();
+	private String _specVersion;
 }

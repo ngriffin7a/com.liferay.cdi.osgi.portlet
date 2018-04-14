@@ -28,8 +28,9 @@ public class BeanPortletFactory {
 			LiferayPortletConfiguration liferayPortletConfiguration,
 			String portletClass) {
 		return create(
-			null, portletConfiguration, liferayPortletConfiguration,
-			portletClass);
+			DefaultPortletApplication.class.getAnnotation(
+				PortletApplication.class), portletConfiguration,
+			liferayPortletConfiguration, portletClass);
 	}
 
 	public static BeanPortlet create(

@@ -34,7 +34,8 @@ public abstract class BeanContextBase implements Context {
 		ScopedBeanHolder scopedBeanHolder = ScopedBeanHolder
 			.getCurrentInstance();
 
-		return scopedBeanHolder.getPortletRequest() != null;
+		return (scopedBeanHolder != null) &&
+		(scopedBeanHolder.getPortletRequest() != null);
 	}
 
 	protected String getAttributeName(Bean bean) {

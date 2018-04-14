@@ -26,6 +26,9 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.portlet.Portlet;
 import javax.portlet.filter.PortletFilter;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -40,12 +43,13 @@ public class RegistrationUtil {
 	public static List<ServiceRegistration<PortletFilter>> registerBeanFilter(
 			BundleContext bundleContext, String portletName,
 			Set<String> allPortletNames, BeanFilter beanFilter,
-			BeanManager beanManager, String servletContextName) {
+			BeanManager beanManager, ServletContext servletContext) {
 
 		List<ServiceRegistration<PortletFilter>> registrations =
 			new ArrayList<>();
 
-		String portletId = getPortletId(portletName, servletContextName);
+		String portletId = getPortletId(
+			portletName, servletContext.getServletContextName());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -77,28 +81,42 @@ public class RegistrationUtil {
 
 	public static ServiceRegistration<Portlet> registerBeanPortlet(
 			BundleContext bundleContext, BeanPortlet beanPortlet,
-			String servletContextName) {
+			ServletContext servletContext) {
 
 		try {
 
 			String portletId = getPortletId(
-				beanPortlet.getPortletName(), servletContextName);
+				beanPortlet.getPortletName(),
+				servletContext.getServletContextName());
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Registering bean portletId: " + portletId);
 			}
 
-			return bundleContext.registerService(
-				Portlet.class,
-				new BeanPortletInvoker(
-					beanPortlet.getBeanMethods(BeanMethod.Type.ACTION),
-					beanPortlet.getBeanMethods(BeanMethod.Type.DESTROY),
-					beanPortlet.getBeanMethods(BeanMethod.Type.EVENT),
-					beanPortlet.getBeanMethods(BeanMethod.Type.HEADER),
-					beanPortlet.getBeanMethods(BeanMethod.Type.INIT),
-					beanPortlet.getBeanMethods(BeanMethod.Type.RENDER),
-					beanPortlet.getBeanMethods(BeanMethod.Type.SERVE_RESOURCE)),
-				beanPortlet.toDictionary(portletId));
+			ServiceRegistration<Portlet> portletServiceRegistration =
+				bundleContext.registerService(
+					Portlet.class,
+					new BeanPortletInvoker(
+						beanPortlet.getBeanMethods(MethodType.ACTION),
+						beanPortlet.getBeanMethods(MethodType.DESTROY),
+						beanPortlet.getBeanMethods(MethodType.EVENT),
+						beanPortlet.getBeanMethods(MethodType.HEADER),
+						beanPortlet.getBeanMethods(MethodType.INIT),
+						beanPortlet.getBeanMethods(MethodType.RENDER),
+						beanPortlet.getBeanMethods(MethodType.SERVE_RESOURCE)),
+					beanPortlet.toDictionary(portletId));
+
+			if (portletServiceRegistration != null) {
+
+				ServletRegistration.Dynamic servletRegistration =
+					servletContext.addServlet(
+						portletId + " Servlet",
+						"com.liferay.portal.kernel.servlet.PortletServlet");
+
+				servletRegistration.addMapping("/portlet-servlet/*");
+			}
+
+			return portletServiceRegistration;
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);

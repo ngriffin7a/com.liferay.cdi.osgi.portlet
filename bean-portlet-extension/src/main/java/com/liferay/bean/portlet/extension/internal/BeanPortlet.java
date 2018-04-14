@@ -28,7 +28,7 @@ public interface BeanPortlet {
 	public void addParsedLiferayPortletConfiguration(
 			Map<String, String> parsedLiferayPortletConfiguration);
 
-	public List<BeanMethod> getBeanMethods(BeanMethod.Type beanMethodType);
+	public List<BeanMethod> getBeanMethods(MethodType methodType);
 
 	public String getPortletClass();
 

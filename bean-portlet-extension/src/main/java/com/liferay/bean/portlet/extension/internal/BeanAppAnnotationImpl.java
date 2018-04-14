@@ -52,6 +52,8 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 				.forEach(
 					prp -> _publicRenderParamMap.put(prp.getIdentifier(), prp));
 		}
+
+		_specVersion = portletApplication.version();
 	}
 
 	@Override
@@ -64,6 +66,12 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 		return _publicRenderParamMap;
 	}
 
+	@Override
+	public String getSpecVersion() {
+		return _specVersion;
+	}
+
 	private List<EventDefinition> _eventDefinitions;
 	private Map<String, PublicRenderParam> _publicRenderParamMap;
+	private String _specVersion;
 }

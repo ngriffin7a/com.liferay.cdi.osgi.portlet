@@ -28,5 +28,7 @@ public interface BeanApp {
 
 	public Map<String, PublicRenderParam> getPublicRenderParameterMap();
 
+	public String getSpecVersion();
+
 	public void setDefaultNamespace(String defaultNamespace);
 }
