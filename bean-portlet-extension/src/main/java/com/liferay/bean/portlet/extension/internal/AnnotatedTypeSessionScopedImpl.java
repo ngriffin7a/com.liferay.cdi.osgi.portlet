@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.AnnotatedType;
 
 import javax.portlet.PortletSession;
@@ -41,11 +41,13 @@ public class AnnotatedTypeSessionScopedImpl<X> extends AnnotatedTypeWrapper<X> {
 				.filter(
 						annotation ->
 							!annotation.annotationType()
-								.equals(RequestScoped.class))
+								.equals(SessionScoped.class))
 				.collect(Collectors.toSet());
 
 		if (!annotationClasses.contains(PortletSessionScoped.class)) {
-			_annotations.add(new PortletSessionScopedAnnotation());
+			_annotations.add(
+				DefaultPortletSessionScoped.class.getAnnotation(
+					PortletSessionScoped.class));
 		}
 	}
 

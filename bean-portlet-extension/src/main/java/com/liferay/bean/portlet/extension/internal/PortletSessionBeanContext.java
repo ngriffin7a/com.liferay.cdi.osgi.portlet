@@ -20,6 +20,7 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 
+import javax.portlet.PortletSession;
 import javax.portlet.annotations.PortletSessionScoped;
 
 /**
@@ -35,19 +36,24 @@ public class PortletSessionBeanContext extends BeanContextBase {
 			.getCurrentInstance();
 		Bean<T> bean = (Bean<T>) contextual;
 		Class<?> beanClass = bean.getBeanClass();
+		int scope = PortletSession.PORTLET_SCOPE;
 
 		PortletSessionScoped portletSessionScoped = beanClass.getAnnotation(
 			PortletSessionScoped.class);
+
+		if (portletSessionScoped != null) {
+			scope = portletSessionScoped.value();
+		}
 
 		String beanName = getAttributeName(bean);
 
 		if (creationalContext == null) {
 			return scopedBeanHolder.getPortletSessionScopedBean(
-				beanName, portletSessionScoped.value());
+				beanName, scope);
 		}
 
 		return scopedBeanHolder.getPortletSessionScopedBean(
-			beanName, portletSessionScoped.value(), bean, creationalContext);
+			beanName, scope, bean, creationalContext);
 	}
 
 	@Override
