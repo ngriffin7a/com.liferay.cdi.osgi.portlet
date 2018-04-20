@@ -427,9 +427,8 @@ public class BeanPortletExtension implements Extension {
 			Method method = scannedMethod.getMethod();
 			String[] portletNames = scannedMethod.getPortletNames();
 			int ordinal = scannedMethod.getOrdinal();
-			BeanMethod beanMethod = new BeanMethodImpl(
-				beanManager, beanMethodType, clazz, method, ordinal,
-				portletNames);
+			BeanMethod beanMethod = new BeanMethod(
+				beanManager, beanMethodType, clazz, method, ordinal);
 			Class<?> beanClass = beanMethod.getBeanClass();
 
 			if (portletNames == null) {
@@ -446,6 +445,16 @@ public class BeanPortletExtension implements Extension {
 					.forEach(
 						beanPortlet -> beanPortlet.addBeanMethod(beanMethod));
 			}
+			else if (
+				(portletNames.length > 0) && ("*".equals(portletNames[0]))) {
+
+				_beanPortlets.keySet()
+					.stream()
+					.forEach(
+						portletName ->
+							_beanPortlets.get(portletName)
+								.addBeanMethod(beanMethod));
+			}
 			else {
 
 				Arrays.stream(portletNames)
@@ -459,9 +468,6 @@ public class BeanPortletExtension implements Extension {
 								new BeanPortletDefaultImpl(portletName)));
 
 				Arrays.stream(portletNames)
-					.filter(
-							portletName ->
-								_beanPortlets.containsKey(portletName))
 					.forEach(
 						portletName ->
 							_beanPortlets.get(portletName)

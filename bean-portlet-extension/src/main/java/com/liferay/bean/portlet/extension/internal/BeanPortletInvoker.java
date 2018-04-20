@@ -14,7 +14,9 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.util.Validator;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -22,6 +24,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import javax.portlet.ActionParameters;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.EventPortlet;
@@ -32,8 +35,10 @@ import javax.portlet.HeaderRequest;
 import javax.portlet.HeaderResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletResponse;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -47,8 +52,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Neil Griffin
  */
-public class BeanPortletInvoker implements EventPortlet, HeaderPortlet,
-	Portlet, ResourceServingPortlet {
+public class BeanPortletInvoker implements EventPortlet, HeaderPortlet, Portlet,
+	ResourceServingPortlet {
 
 	public BeanPortletInvoker(
 			List<BeanMethod> actionMethods, List<BeanMethod> destroyMethods,
@@ -129,6 +134,69 @@ public class BeanPortletInvoker implements EventPortlet, HeaderPortlet,
 			resourceRequest, resourceResponse, _serveResourceMethods);
 	}
 
+	protected void invokeBeanMethod(BeanMethod beanMethod, Object... args)
+		throws InvocationTargetException, IllegalAccessException, IOException,
+			PortletException {
+
+		if (beanMethod.getType() == MethodType.ACTION) {
+
+			ActionRequest actionRequest = (ActionRequest) args[0];
+			ActionParameters actionParameters =
+				actionRequest.getActionParameters();
+			String actionName = actionParameters.getValue(
+				ActionRequest.ACTION_NAME);
+
+			if ((actionName == null) ||
+				actionName.equals(beanMethod.getActionName())) {
+				beanMethod.invoke(args);
+			}
+		}
+		else if (
+			(beanMethod.getType() == MethodType.RENDER) &&
+			(beanMethod.getParameterCount() == 0)) {
+
+			String markup = (String) beanMethod.invoke(null);
+
+			if (markup != null) {
+				RenderResponse renderResponse = (RenderResponse) args[1];
+				PrintWriter writer = renderResponse.getWriter();
+				writer.write(markup);
+			}
+		}
+		else if (
+			(beanMethod.getType() == MethodType.SERVE_RESOURCE) &&
+			(beanMethod.getParameterCount() == 0)) {
+
+			String markup = (String) beanMethod.invoke(null);
+
+			if (markup != null) {
+				ResourceResponse resourceResponse = (ResourceResponse) args[1];
+				PrintWriter writer = resourceResponse.getWriter();
+				writer.write(markup);
+			}
+		}
+		else {
+			beanMethod.invoke(args);
+		}
+
+		String include = beanMethod.getInclude();
+
+		if (Validator.isNotNull(include)) {
+			PortletContext portletContext = _portletConfig.getPortletContext();
+			PortletRequestDispatcher portletRequestDispatcher =
+				portletContext.getRequestDispatcher(include);
+
+			if (portletRequestDispatcher != null) {
+				portletRequestDispatcher.include(
+					(PortletRequest) args[0], (PortletResponse) args[1]);
+			}
+			else {
+				_log.error(
+					"Unable to acquire dispatcher for include=" + include);
+			}
+		}
+	}
+
 	protected void invokeBeanMethods(
 			List<BeanMethod> beanMethods, Object... args)
 		throws PortletException {
@@ -136,11 +204,19 @@ public class BeanPortletInvoker implements EventPortlet, HeaderPortlet,
 		for (BeanMethod beanMethod : beanMethods) {
 
 			try {
-				beanMethod.invoke(args);
+				invokeBeanMethod(beanMethod, args);
 			}
-			catch (InvocationTargetException | IllegalAccessException e) {
+			catch (Exception e) {
+				String message = e.getMessage();
 				Throwable cause = e.getCause();
-				String message = cause.getMessage();
+
+				if (cause == null) {
+					cause = e;
+				}
+				else {
+					message = cause.getMessage();
+				}
+
 				Class<?> beanClass = beanMethod.getBeanClass();
 
 				if ((message != null) && message.startsWith("Config is null") &&

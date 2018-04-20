@@ -17,21 +17,127 @@ package com.liferay.bean.portlet.extension.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+
+import javax.portlet.ProcessAction;
+import javax.portlet.annotations.ActionMethod;
+import javax.portlet.annotations.HeaderMethod;
+import javax.portlet.annotations.RenderMethod;
+import javax.portlet.annotations.ServeResourceMethod;
+
 /**
  * @author Neil Griffin
  */
-public interface BeanMethod {
+public class BeanMethod {
 
-	public Class<?> getBeanClass();
+	public BeanMethod(
+			BeanManager beanManager, MethodType type, Class<?> beanClass,
+			Method method, int ordinal) {
+		_beanManager = beanManager;
+		_type = type;
+		_beanClass = beanClass;
+		_method = method;
+		_bean = beanManager.resolve(beanManager.getBeans(beanClass));
+		_ordinal = ordinal;
+	}
 
-	public Method getMethod();
+	public String getActionName() {
 
-	public int getOrdinal();
+		ActionMethod actionMethod = _method.getAnnotation(ActionMethod.class);
 
-	public String[] getPortletNames();
+		if (actionMethod == null) {
+			return null;
+		}
 
-	public MethodType getType();
+		String actionName = actionMethod.actionName();
 
-	public void invoke(Object... args) throws InvocationTargetException,
-		IllegalAccessException;
+		if (actionName != null) {
+			return actionName;
+		}
+
+		ProcessAction processAction = _method.getAnnotation(
+			ProcessAction.class);
+
+		if (processAction == null) {
+			return null;
+		}
+
+		return processAction.name();
+	}
+
+	public Class<?> getBeanClass() {
+		return _beanClass;
+	}
+
+	public String getInclude() {
+
+		if (_type == MethodType.HEADER) {
+
+			HeaderMethod headerMethod = _method.getAnnotation(
+				HeaderMethod.class);
+
+			if (headerMethod != null) {
+				return headerMethod.include();
+			}
+		}
+		else if (_type == MethodType.RENDER) {
+
+			RenderMethod renderMethod = _method.getAnnotation(
+				RenderMethod.class);
+
+			if (renderMethod != null) {
+				return renderMethod.include();
+			}
+		}
+		else if (_type == MethodType.SERVE_RESOURCE) {
+
+			ServeResourceMethod serveResourceMethod = _method.getAnnotation(
+				ServeResourceMethod.class);
+
+			if (serveResourceMethod != null) {
+				return serveResourceMethod.include();
+			}
+		}
+
+		return null;
+	}
+
+	public Method getMethod() {
+		return _method;
+	}
+
+	public int getOrdinal() {
+		return _ordinal;
+	}
+
+	public int getParameterCount() {
+		return _method.getParameterCount();
+	}
+
+	public MethodType getType() {
+		return _type;
+	}
+
+	public Object invoke(Object... args) throws InvocationTargetException,
+		IllegalAccessException {
+
+		Object beanInstance = _beanManager.getReference(
+			_bean, _bean.getBeanClass(),
+			_beanManager.createCreationalContext(_bean));
+
+		try {
+			return _method.invoke(beanInstance, args);
+		}
+		catch (IllegalArgumentException e) {
+			throw new InvocationTargetException(e);
+		}
+	}
+
+	private BeanManager _beanManager;
+	private Bean<?> _bean;
+	private Class<?> _beanClass;
+	private Method _method;
+	private int _ordinal;
+	private MethodType _type;
 }
