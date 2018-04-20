@@ -150,7 +150,9 @@ public class PortletDescriptorParser {
 						beanApp.setDefaultNamespace(elementText);
 					}
 					else if ("description".equals(elementName)) {
-						beanPortlet.setDescription(elementText);
+						if (beanPortlet != null) {
+							beanPortlet.setDescription(elementText);
+						}
 					}
 					else if ("display-name".equals(elementName)) {
 						beanPortlet.setDisplayName(elementText);
@@ -303,7 +305,9 @@ public class PortletDescriptorParser {
 						}
 					}
 					else if ("portlet-mode".equals(elementName)) {
-						descriptorSupports.addPortletMode(elementText);
+						if (descriptorSupports != null) {
+							descriptorSupports.addPortletMode(elementText);
+						}
 					}
 					else if ("preference".equals(elementName)) {
 						beanPortlet.addPreference(descriptorPreference);
@@ -394,7 +398,9 @@ public class PortletDescriptorParser {
 						eventDefinition.setValueType(elementText);
 					}
 					else if ("window-state".equals(elementName)) {
-						descriptorSupports.addWindowState(elementText);
+						if (descriptorSupports != null) {
+							descriptorSupports.addWindowState(elementText);
+						}
 					}
 				}
 			}
