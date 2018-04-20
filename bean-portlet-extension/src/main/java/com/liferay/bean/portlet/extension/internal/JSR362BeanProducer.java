@@ -151,7 +151,13 @@ public class JSR362BeanProducer {
 			return null;
 		}
 
-		return Arrays.asList(portletRequest.getCookies());
+		Cookie[] cookies = portletRequest.getCookies();
+
+		if (cookies == null) {
+			return null;
+		}
+
+		return Arrays.asList(cookies);
 	}
 
 	@Named("eventRequest")
