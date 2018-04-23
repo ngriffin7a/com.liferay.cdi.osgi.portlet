@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.AnnotatedType;
 
-import javax.portlet.PortletSession;
 import javax.portlet.annotations.PortletSessionScoped;
 
 /**
@@ -83,20 +82,6 @@ public class AnnotatedTypeSessionScopedImpl<X> extends AnnotatedTypeWrapper<X> {
 		}
 
 		return false;
-	}
-
-	private static class PortletSessionScopedAnnotation implements Annotation,
-		PortletSessionScoped {
-
-		@Override
-		public Class<? extends Annotation> annotationType() {
-			return PortletSessionScoped.class;
-		}
-
-		@Override
-		public int value() {
-			return PortletSession.PORTLET_SCOPE;
-		}
 	}
 
 	private Set<Annotation> _annotations = new HashSet<>();
