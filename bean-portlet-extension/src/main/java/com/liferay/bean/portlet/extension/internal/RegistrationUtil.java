@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -114,6 +115,19 @@ public class RegistrationUtil {
 						"com.liferay.portal.kernel.servlet.PortletServlet");
 
 				servletRegistration.addMapping("/portlet-servlet/*");
+
+				Set<String> beanPortletIds =
+					(Set<String>)servletContext.getAttribute(
+						"com.liferay.beanPortletIds");
+
+				if (beanPortletIds == null) {
+					beanPortletIds= new HashSet<>();
+				}
+
+				beanPortletIds.add(portletId);
+
+				servletContext.setAttribute(
+					"com.liferay.beanPortletIds", beanPortletIds);
 			}
 
 			return portletServiceRegistration;
