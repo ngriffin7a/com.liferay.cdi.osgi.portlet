@@ -22,8 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import javax.portlet.ActionParameters;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -207,25 +205,10 @@ public class BeanPortletInvoker implements EventPortlet, HeaderPortlet, Portlet,
 				invokeBeanMethod(beanMethod, args);
 			}
 			catch (Exception e) {
-				String message = e.getMessage();
 				Throwable cause = e.getCause();
 
 				if (cause == null) {
 					cause = e;
-				}
-				else {
-					message = cause.getMessage();
-				}
-
-				Class<?> beanClass = beanMethod.getBeanClass();
-
-				if ((message != null) && message.startsWith("Config is null") &&
-					(beanClass.getAnnotation(ApplicationScoped.class) ==
-						null)) {
-
-					_log.error(
-						"Class {} is not annotated with @ApplicationScoped",
-						beanClass.getName());
 				}
 
 				throw new PortletException(cause);

@@ -121,9 +121,14 @@ public class BeanPortletExtension implements Extension {
 
 					portletDescriptor.getBeanPortlets()
 						.forEach(
-							beanPortlet ->
+							beanPortlet -> {
 								_beanPortlets.put(
-									beanPortlet.getPortletName(), beanPortlet));
+									beanPortlet.getPortletName(), beanPortlet);
+								scanBeanPortletClass(
+									loadBeanPortletClass(
+										beanPortlet.getPortletClass()),
+									beanPortlet.getPortletName());
+							});
 				}
 				catch (Exception e) {
 					_log.error(e.getMessage(), e);
@@ -136,13 +141,20 @@ public class BeanPortletExtension implements Extension {
 							clazz.getAnnotation(PortletConfigurations.class)
 								.value())
 						.forEach(
-							portletConfiguration ->
-								scanBeanPortlet(clazz, portletConfiguration)));
+							portletConfiguration -> {
+								addBeanPortlet(clazz, portletConfiguration);
+								scanBeanPortletClass(
+									clazz, portletConfiguration.portletName());
+							}));
 
 			_portletConfigurationClasses.forEach(
-				clazz ->
-					scanBeanPortlet(
-						clazz, clazz.getAnnotation(PortletConfiguration.class)));
+				clazz -> {
+					PortletConfiguration portletConfiguration =
+						clazz.getAnnotation(PortletConfiguration.class);
+					addBeanPortlet(clazz, portletConfiguration);
+					scanBeanPortletClass(
+						clazz, portletConfiguration.portletName());
+				});
 
 			_beanFilters.addAll(
 				_portletLifecycleFilterClasses.stream()
@@ -253,6 +265,7 @@ public class BeanPortletExtension implements Extension {
 	public void beforeBeanDiscovery(
 			@Observes BeforeBeanDiscovery beforeBeanDiscovery,
 			BeanManager beanManager) {
+
 		beforeBeanDiscovery.addQualifier(ContextPath.class);
 		beforeBeanDiscovery.addQualifier(Namespace.class);
 		beforeBeanDiscovery.addQualifier(PortletName.class);
@@ -329,6 +342,19 @@ public class BeanPortletExtension implements Extension {
 			}
 		}
 
+		if (Portlet.class.isAssignableFrom(annotatedClass) &&
+			!annotationClasses.contains(ApplicationScoped.class)) {
+			annotatedType = new AnnotatedTypeApplicationScopedImpl(
+				annotatedType);
+			processAnnotatedType.setAnnotatedType(annotatedType);
+
+			if (_log.isDebugEnabled()) {
+				_log.warn(
+					"Automatically added @ApplicationScoped to " +
+					annotatedClass);
+			}
+		}
+
 		if (annotationClasses.contains(PortletApplication.class)) {
 
 			if (_portletApplicationClass == null) {
@@ -395,6 +421,41 @@ public class BeanPortletExtension implements Extension {
 			scanMethods(
 				annotatedClass, MethodType.SERVE_RESOURCE,
 				ServeResourceMethod.class, MethodSignature.SERVE_RESOURCE));
+	}
+
+	protected void addBeanPortlet(
+			Class<?> beanPortletClass,
+			PortletConfiguration portletConfiguration) {
+
+		String configuredPortletName = portletConfiguration.portletName();
+
+		if ((configuredPortletName != null) &&
+			(configuredPortletName.length() > 0)) {
+
+			if (_portletApplicationClass == null) {
+				_beanPortlets.putIfAbsent(
+					configuredPortletName,
+					BeanPortletFactory.create(
+						portletConfiguration,
+						getLiferayPortletConfiguration(configuredPortletName),
+						beanPortletClass.getName()));
+			}
+			else {
+				_beanPortlets.putIfAbsent(
+					configuredPortletName,
+					BeanPortletFactory.create(
+						_portletApplicationClass.getAnnotation(
+							PortletApplication.class), portletConfiguration,
+						getLiferayPortletConfiguration(configuredPortletName),
+						beanPortletClass.getName()));
+			}
+		}
+		else {
+			_log.error(
+				"Invalid portletName attribute for {}",
+				beanPortletClass.getName());
+		}
+
 	}
 
 	protected void applicationScopedBeforeDestroyed(
@@ -509,110 +570,91 @@ public class BeanPortletExtension implements Extension {
 		return null;
 	}
 
-	protected void scanBeanPortlet(
-			Class<?> annotatedClass,
-			PortletConfiguration portletConfiguration) {
+	protected Class<?> loadBeanPortletClass(String portletClass) {
 
-		String configuredPortletName = portletConfiguration.portletName();
-
-		if ((configuredPortletName != null) &&
-			(configuredPortletName.length() > 0)) {
-
-			if (_portletApplicationClass == null) {
-				_beanPortlets.put(
-					configuredPortletName,
-					BeanPortletFactory.create(
-						portletConfiguration,
-						getLiferayPortletConfiguration(configuredPortletName),
-						annotatedClass.getName()));
-			}
-			else {
-				_beanPortlets.put(
-					configuredPortletName,
-					BeanPortletFactory.create(
-						_portletApplicationClass.getAnnotation(
-							PortletApplication.class), portletConfiguration,
-						getLiferayPortletConfiguration(configuredPortletName),
-						annotatedClass.getName()));
-			}
+		try {
+			return Class.forName(portletClass);
 		}
-		else {
-			_log.error(
-				"Invalid portletName attribute for {}",
-				annotatedClass.getName());
-		}
+		catch (ClassNotFoundException e) {
+			_log.error(e.getMessage(), e);
 
-		if (Portlet.class.isAssignableFrom(annotatedClass)) {
+			return null;
+		}
+	}
+
+	protected void scanBeanPortletClass(
+			Class<?> beanPortletClass, String portletName) {
+
+		if (Portlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
 				_actionMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.ACTION,
-						annotatedClass.getMethod(
+						beanPortletClass, MethodType.ACTION,
+						beanPortletClass.getMethod(
 							"processAction", ActionRequest.class,
-							ActionResponse.class), configuredPortletName));
+							ActionResponse.class), portletName));
 
 				_destroyMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.DESTROY,
-						annotatedClass.getMethod("destroy"),
-						configuredPortletName));
+						beanPortletClass, MethodType.DESTROY,
+						beanPortletClass.getMethod("destroy"), portletName));
 				_initMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.INIT,
-						annotatedClass.getMethod("init", PortletConfig.class),
-						configuredPortletName));
+						beanPortletClass, MethodType.INIT,
+						beanPortletClass.getMethod("init", PortletConfig.class),
+						portletName));
 				_renderMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.RENDER,
-						annotatedClass.getMethod(
+						beanPortletClass, MethodType.RENDER,
+						beanPortletClass.getMethod(
 							"render", RenderRequest.class,
-							RenderResponse.class), configuredPortletName));
+							RenderResponse.class), portletName));
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
 			}
 		}
 
-		if (EventPortlet.class.isAssignableFrom(annotatedClass)) {
+		if (EventPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
 				_eventMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.EVENT,
-						annotatedClass.getMethod(
+						beanPortletClass, MethodType.EVENT,
+						beanPortletClass.getMethod(
 							"processEvent", EventRequest.class,
-							EventResponse.class), configuredPortletName));
+							EventResponse.class), portletName));
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
 			}
 		}
 
-		if (HeaderPortlet.class.isAssignableFrom(annotatedClass)) {
+		if (HeaderPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
 				_headerMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.HEADER,
-						annotatedClass.getMethod(
+						beanPortletClass, MethodType.HEADER,
+						beanPortletClass.getMethod(
 							"renderHeaders", HeaderRequest.class,
-							HeaderResponse.class), configuredPortletName));
+							HeaderResponse.class), portletName));
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
 			}
 		}
 
-		if (ResourceServingPortlet.class.isAssignableFrom(annotatedClass)) {
+		if (ResourceServingPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
 				_serveResourceMethods.add(
 					new ScannedMethod(
-						annotatedClass, MethodType.SERVE_RESOURCE,
-						annotatedClass.getMethod(
+						beanPortletClass, MethodType.SERVE_RESOURCE,
+						beanPortletClass.getMethod(
 							"serveResource", ResourceRequest.class,
-							ResourceResponse.class), configuredPortletName));
+							ResourceResponse.class), portletName));
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
