@@ -16,6 +16,7 @@ package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import com.liferay.bean.portlet.extension.LiferayPortletConfigurations;
+import com.liferay.portal.kernel.util.StringBundler;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -199,11 +200,48 @@ public class BeanPortletExtension implements Extension {
 						.filter(Objects::nonNull)
 						.forEach(
 							beanPortlet ->
-								beanPortlet
-									.addParsedLiferayPortletConfiguration(
-										liferayDescriptor
-											.getPortletConfiguration(
-												beanPortlet.getPortletName())));
+								beanPortlet.addLiferayConfiguration(
+									liferayDescriptor.getPortletConfiguration(
+										beanPortlet.getPortletName())));
+				}
+				catch (Exception e) {
+					_log.error(e.getMessage(), e);
+				}
+			}
+
+			URL displayDescriptorURL = bundle.getEntry(
+				"WEB-INF/liferay-display.xml");
+
+			if (displayDescriptorURL != null) {
+
+				try {
+					Map<String, String> categoryMap = DisplayDescriptorParser
+						.parse(displayDescriptorURL);
+
+					categoryMap.entrySet()
+						.stream()
+						.filter(
+								entry -> {
+
+									if (_beanPortlets.containsKey(
+											entry.getKey())) {
+										return true;
+									}
+									else {
+										_log.error(
+											"Unknown portletId " +
+											entry.getKey() +
+											" found in liferay-display.xml");
+
+										return false;
+									}
+								})
+						.forEach(
+							entry ->
+								_beanPortlets.get(entry.getKey())
+									.addLiferayConfiguration(
+										"com.liferay.portlet.display-category",
+										entry.getValue()));
 				}
 				catch (Exception e) {
 					_log.error(e.getMessage(), e);
@@ -260,11 +298,21 @@ public class BeanPortletExtension implements Extension {
 										_beanPortlets.keySet(), beanFilter,
 										beanManager, servletContext))));
 
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Discovered ", String.valueOf(_beanPortlets.size()),
+					" bean portlets and ", String.valueOf(_beanFilters.size()),
+					" bean filters for ",
+					servletContext.getServletContextName()));
+		}
 	}
 
 	public void beforeBeanDiscovery(
 			@Observes BeforeBeanDiscovery beforeBeanDiscovery,
 			BeanManager beanManager) {
+
+		_log.debug("Scanning for bean portlets and bean filters");
 
 		beforeBeanDiscovery.addQualifier(ContextPath.class);
 		beforeBeanDiscovery.addQualifier(Namespace.class);
@@ -283,8 +331,9 @@ public class BeanPortletExtension implements Extension {
 	public <T> void processAnnotatedType(
 			@Observes ProcessAnnotatedType<T> processAnnotatedType) {
 
-		System.err.println(
-			"!@#$ processAnnotatedType: " + processAnnotatedType);
+		if (_log.isDebugEnabled()) {
+			_log.debug("processAnnotatedType=" + processAnnotatedType);
+		}
 
 		AnnotatedType<T> annotatedType =
 			processAnnotatedType.getAnnotatedType();

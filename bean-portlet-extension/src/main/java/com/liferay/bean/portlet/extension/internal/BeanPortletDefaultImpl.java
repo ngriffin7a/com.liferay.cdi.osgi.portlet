@@ -42,7 +42,7 @@ public class BeanPortletDefaultImpl extends BeanPortletBase {
 			.toDictionary(portletId);
 
 		portletDictionary.put("javax.portlet.info.title", _portletName);
-		portletDictionary.putAll(getParsedLiferayPortletConfiguration());
+		portletDictionary.putAll(getLiferayConfiguration());
 
 		return portletDictionary;
 	}

@@ -14,6 +14,8 @@
 
 package com.liferay.test;
 
+import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -47,6 +49,12 @@ import javax.portlet.annotations.ServeResourceMethod;
 		description = @LocaleString("hello bean portlet description"),
 		title = @LocaleString("hello bean portlet title")
 	)
+)
+@LiferayPortletConfiguration(
+	portletName = "helloBeanPortlet",
+	properties = {
+		"com.liferay.portlet.display-category=category.sample"
+	}
 )
 public class HelloBeanPortlet {
 

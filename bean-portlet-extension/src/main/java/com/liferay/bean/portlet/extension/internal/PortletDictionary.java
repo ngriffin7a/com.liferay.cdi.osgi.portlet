@@ -39,10 +39,10 @@ public class PortletDictionary extends Hashtable<String, Object> {
 		}
 	}
 
-	public void putIfNotEmpty(String name, String[] values) {
+	public void putIfNotEmpty(String name, String value) {
 
-		if ((values != null) && (values.length > 0)) {
-			put(name, values);
+		if ((value != null) && (value.length() > 0)) {
+			put(name, value);
 		}
 	}
 

@@ -238,10 +238,8 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.security-role-ref",
 			_descriptorSecurityRoleRefs.stream()
-				.map(
-						roleRef ->
-							roleRef.getRoleName() + "," + roleRef.getRoleLink())
-				.collect(Collectors.toList()));
+				.map(roleRef -> roleRef.getRoleName())
+				.collect(Collectors.joining(",")));
 
 		portletDictionary.put(
 			"javax.portlet.supported-public-render-parameter",
@@ -307,7 +305,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			"javax.portlet.supported-publishing-event",
 			supportedPublishingEvents);
 
-		portletDictionary.putAll(getParsedLiferayPortletConfiguration());
+		portletDictionary.putAll(getLiferayConfiguration());
 
 		return portletDictionary;
 	}

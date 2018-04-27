@@ -61,7 +61,8 @@ import org.slf4j.LoggerFactory;
 	portletName = "fooBeanPortlet",
 	properties = {
 			"com.liferay.portlet.requires-namespaced-parameters=false",
-			"com.liferay.portlet.ajaxable=true"
+			"com.liferay.portlet.ajaxable=true",
+			"com.liferay.portlet.display-category=category.sample"
 		}
 )
 public class FooBeanPortlet extends GenericPortlet {

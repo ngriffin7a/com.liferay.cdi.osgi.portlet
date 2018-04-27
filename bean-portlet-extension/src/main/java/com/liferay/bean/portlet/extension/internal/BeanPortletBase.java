@@ -105,15 +105,19 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
-	public void addParsedLiferayPortletConfiguration(
-			Map<String, String> parsedLiferayPortletConfiguration) {
+	public void addLiferayConfiguration(
+			Map<String, String> liferayConfiguration) {
 
-		if (_parsedLiferayPortletConfiguration.size() == 0) {
-			_parsedLiferayPortletConfiguration = new HashMap<>();
+		if (_liferayConfiguration.size() == 0) {
+			_liferayConfiguration = new HashMap<>();
 		}
 
-		_parsedLiferayPortletConfiguration.putAll(
-			parsedLiferayPortletConfiguration);
+		_liferayConfiguration.putAll(liferayConfiguration);
+	}
+
+	@Override
+	public void addLiferayConfiguration(String name, String value) {
+		_liferayConfiguration.put(name, value);
 	}
 
 	@Override
@@ -235,8 +239,8 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		return portletDictionary;
 	}
 
-	protected Map<String, String> getParsedLiferayPortletConfiguration() {
-		return _parsedLiferayPortletConfiguration;
+	protected Map<String, String> getLiferayConfiguration() {
+		return _liferayConfiguration;
 	}
 
 	protected String getPublicRenderParameterNamespaceURI(String id) {
@@ -271,8 +275,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	private List<BeanMethod> _eventMethods = Collections.emptyList();
 	private List<BeanMethod> _headerMethods = Collections.emptyList();
 	private List<BeanMethod> _initMethods = Collections.emptyList();
-	private Map<String, String> _parsedLiferayPortletConfiguration = Collections
-		.emptyMap();
+	private Map<String, String> _liferayConfiguration = Collections.emptyMap();
 	private List<BeanMethod> _renderMethods = Collections.emptyList();
 	private List<BeanMethod> _serveResourceMethods = Collections.emptyList();
 }

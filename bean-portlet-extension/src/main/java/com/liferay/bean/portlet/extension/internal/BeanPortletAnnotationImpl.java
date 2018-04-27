@@ -157,8 +157,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			"javax.portlet.security-role-ref",
 			Arrays.stream(_portletConfiguration.roleRefs())
 				.map(roleRef ->
-							roleRef.roleName() + "," + roleRef.roleLink())
-				.collect(Collectors.toList()));
+							roleRef.roleName())
+				.collect(Collectors.joining(",")));
 
 		portletDictionary.put(
 			"javax.portlet.supported-public-render-parameter",
@@ -185,7 +185,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 				.collect(Collectors.toList()));
 
 		portletDictionary.putAll(_liferayPortletConfigurationProperties);
-		portletDictionary.putAll(getParsedLiferayPortletConfiguration());
+		portletDictionary.putAll(getLiferayConfiguration());
 
 		return portletDictionary;
 	}
