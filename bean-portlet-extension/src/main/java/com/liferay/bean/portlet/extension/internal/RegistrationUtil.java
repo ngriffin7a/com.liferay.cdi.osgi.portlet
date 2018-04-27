@@ -77,6 +77,19 @@ public class RegistrationUtil {
 					beanFilter.toDictionary(portletName)));
 		}
 
+		Set<String> beanFilterNames =
+			(Set<String>)servletContext.getAttribute(
+				"com.liferay.beanFilterNames");
+
+		if (beanFilterNames == null) {
+			beanFilterNames= new HashSet<>();
+		}
+
+		beanFilterNames.add(beanFilter.getFilterName());
+
+		servletContext.setAttribute(
+			"com.liferay.beanFilterNames", beanFilterNames);
+
 		return registrations;
 	}
 
