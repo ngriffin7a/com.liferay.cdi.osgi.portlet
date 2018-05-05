@@ -58,6 +58,7 @@ public class PortletDescriptorParser {
 
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
+
 		//J-
 		// String customPortletMode = null;
 		// boolean customPortletModePortalManaged = false;
@@ -173,6 +174,7 @@ public class PortletDescriptorParser {
 							descriptorContainerRuntimeOption.getValues());
 						descriptorContainerRuntimeOption = null;
 					}
+
 					//J-
 					/*
 					else if ("custom-portlet-mode".equals(elementName)) {
@@ -345,6 +347,7 @@ public class PortletDescriptorParser {
 								Integer.parseInt(elementText));
 						}
 					}
+
 					//J-
 					/*
 					else if ("portal-managed".equals(elementName)) {

@@ -390,6 +390,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 	private String _description;
 	private Map<String, List<String>> _containerRuntimeOptions = Collections
 		.emptyMap();
+
 	//J-
 	/*
 	private List<String> _customPortletModes = Collections.emptyList();
