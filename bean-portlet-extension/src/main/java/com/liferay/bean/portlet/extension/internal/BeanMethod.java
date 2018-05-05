@@ -20,7 +20,9 @@ import java.lang.reflect.Method;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
+import javax.portlet.PortletMode;
 import javax.portlet.ProcessAction;
+import javax.portlet.RenderMode;
 import javax.portlet.annotations.ActionMethod;
 import javax.portlet.annotations.HeaderMethod;
 import javax.portlet.annotations.RenderMethod;
@@ -46,14 +48,13 @@ public class BeanMethod {
 
 		ActionMethod actionMethod = _method.getAnnotation(ActionMethod.class);
 
-		if (actionMethod == null) {
-			return null;
-		}
+		if (actionMethod != null) {
 
-		String actionName = actionMethod.actionName();
+			String actionName = actionMethod.actionName();
 
-		if (actionName != null) {
-			return actionName;
+			if (actionName != null) {
+				return actionName;
+			}
 		}
 
 		ProcessAction processAction = _method.getAnnotation(
@@ -64,6 +65,28 @@ public class BeanMethod {
 		}
 
 		return processAction.name();
+	}
+
+	public PortletMode getPortletMode() {
+
+		RenderMethod renderMethod = _method.getAnnotation(RenderMethod.class);
+
+		if (renderMethod != null) {
+
+			String portletMode = renderMethod.portletMode();
+
+			if (portletMode != null) {
+				return new PortletMode(portletMode);
+			}
+		}
+
+		RenderMode renderMode = _method.getAnnotation(RenderMode.class);
+
+		if (renderMode == null) {
+			return null;
+		}
+
+		return new PortletMode(renderMode.name());
 	}
 
 	public Class<?> getBeanClass() {

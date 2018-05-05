@@ -35,6 +35,7 @@ import javax.portlet.Portlet;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletContext;
 import javax.portlet.PortletException;
+import javax.portlet.PortletMode;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.PortletResponse;
@@ -149,16 +150,30 @@ public class BeanPortletInvoker implements EventPortlet, HeaderPortlet, Portlet,
 				beanMethod.invoke(args);
 			}
 		}
-		else if (
-			(beanMethod.getType() == MethodType.RENDER) &&
-			(beanMethod.getParameterCount() == 0)) {
+		else if (beanMethod.getType() == MethodType.RENDER) {
 
-			String markup = (String) beanMethod.invoke(null);
+			RenderRequest renderRequest = (RenderRequest) args[0];
+			PortletMode portletMode = renderRequest.getPortletMode();
 
-			if (markup != null) {
-				RenderResponse renderResponse = (RenderResponse) args[1];
-				PrintWriter writer = renderResponse.getWriter();
-				writer.write(markup);
+			PortletMode beanMethodPortletMode = beanMethod.getPortletMode();
+
+			if ((beanMethodPortletMode == null) ||
+				portletMode.equals(beanMethodPortletMode)) {
+
+				if (beanMethod.getParameterCount() == 0) {
+
+					String markup = (String) beanMethod.invoke(null);
+
+					if (markup != null) {
+						RenderResponse renderResponse = (RenderResponse)
+							args[1];
+						PrintWriter writer = renderResponse.getWriter();
+						writer.write(markup);
+					}
+				}
+				else {
+					beanMethod.invoke(args);
+				}
 			}
 		}
 		else if (
