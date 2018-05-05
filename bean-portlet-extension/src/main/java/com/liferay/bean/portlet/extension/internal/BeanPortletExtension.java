@@ -16,7 +16,7 @@ package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import com.liferay.bean.portlet.extension.LiferayPortletConfigurations;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.petra.string.StringBundler;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -182,10 +182,18 @@ public class BeanPortletExtension implements Extension {
 								portletName ->
 									!_beanPortlets.containsKey(portletName))
 						.forEach(
-							portletName ->
+							portletName -> {
+								_log.warn(
+									StringBundler.concat(
+										"Portlet with the name ", portletName,
+										" is described in liferay-portlet.xml",
+										" but does not have a matching entry ",
+										" in portlet.xml or ",
+										" @PortletConfiguration annotation"));
 								_beanPortlets.put(
 									portletName,
-									new BeanPortletDefaultImpl(portletName)));
+									new BeanPortletDefaultImpl(portletName));
+							});
 
 					liferayDescriptor.getPortletNames()
 						.stream()
@@ -298,14 +306,10 @@ public class BeanPortletExtension implements Extension {
 										_beanPortlets.keySet(), beanFilter,
 										beanManager, servletContext))));
 
-		if (_log.isInfoEnabled()) {
-			_log.info(
-				StringBundler.concat(
-					"Discovered ", String.valueOf(_beanPortlets.size()),
-					" bean portlets and ", String.valueOf(_beanFilters.size()),
-					" bean filters for ",
-					servletContext.getServletContextName()));
-		}
+		_log.info(
+			"Discovered {} bean portlets and {} bean filters for {}",
+			_beanPortlets.size(), _beanFilters.size(),
+			servletContext.getServletContextName());
 	}
 
 	public void beforeBeanDiscovery(
