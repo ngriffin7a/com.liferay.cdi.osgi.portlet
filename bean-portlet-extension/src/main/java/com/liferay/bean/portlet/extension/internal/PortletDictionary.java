@@ -32,7 +32,7 @@ public class PortletDictionary extends Hashtable<String, Object> {
 		}
 	}
 
-	public void putIfNotEmpty(String name, Collection<String> collection) {
+	public void putIfNotEmpty(String name, Collection<?> collection) {
 
 		if ((collection != null) && (collection.size() > 0)) {
 			put(name, collection);
