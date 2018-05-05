@@ -40,10 +40,19 @@ public class DescriptorPreference {
 		return _values;
 	}
 
+	public boolean isReadOnly() {
+		return _readOnly;
+	}
+
 	public void setName(String name) {
 		_name = name;
 	}
 
+	public void setReadOnly(boolean readOnly) {
+		_readOnly = readOnly;
+	}
+
 	private String _name;
+	private boolean _readOnly;
 	private List<String> _values = Collections.emptyList();
 }

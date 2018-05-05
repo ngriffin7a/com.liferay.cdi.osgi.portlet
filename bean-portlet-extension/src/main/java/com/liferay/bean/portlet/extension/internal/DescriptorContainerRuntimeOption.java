@@ -14,29 +14,30 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
-import java.util.Dictionary;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Neil Griffin
  */
-public interface BeanPortlet {
+public class DescriptorContainerRuntimeOption {
 
-	public void addBeanMethod(BeanMethod beanMethod);
+	public void addValue(String value) {
+		_values.add(value);
+	}
 
-	public void addPortletDependency(PortletDependency portletDependency);
+	public String getName() {
+		return _name;
+	}
 
-	public void addLiferayConfiguration(
-			Map<String, String> liferayConfiguration);
+	public List<String> getValues() {
+		return _values;
+	}
 
-	public void addLiferayConfiguration(String name, String value);
+	public void setName(String name) {
+		_name = name;
+	}
 
-	public List<BeanMethod> getBeanMethods(MethodType methodType);
-
-	public String getPortletClass();
-
-	public String getPortletName();
-
-	public Dictionary<String, Object> toDictionary(String portletId);
+	private String _name;
+	private List<String> _values = new ArrayList<>();
 }

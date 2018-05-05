@@ -15,10 +15,14 @@
 package com.liferay.bean.portlet.extension.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,35 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 	public BeanPortletDescriptorImpl(BeanApp beanApp) {
 		super(beanApp);
 	}
+
+	public void addContainerRuntimeOption(String name, List<String> values) {
+
+		if (_containerRuntimeOptions.size() == 0) {
+			_containerRuntimeOptions = new HashMap<>();
+		}
+
+		_containerRuntimeOptions.put(name, values);
+	}
+
+	/*
+	public void addCustomPortletMode(String customPortletMode) {
+
+		if (_customPortletModes.isEmpty()) {
+			_customPortletModes = new ArrayList<>();
+		}
+
+		_customPortletModes.add(customPortletMode);
+	}
+
+	public void addCustomWindowState(String customWindowState) {
+
+		if (_customWindowStates.isEmpty()) {
+			_customWindowStates = new ArrayList<>();
+		}
+
+		_customWindowStates.add(customWindowState);
+	}
+	*/
 
 	public void addInitParam(DescriptorInitParam descriptorInitParam) {
 
@@ -75,6 +108,15 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		}
 
 		_shortTitles.add(shortTitle);
+	}
+
+	public void addSupportedLocale(String supportedLocale) {
+
+		if (_supportedLocales.size() == 0) {
+			_supportedLocales = new ArrayList<>();
+		}
+
+		_supportedLocales.add(supportedLocale);
 	}
 
 	public void addSupportedProcessingEvent(
@@ -135,6 +177,10 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		return _portletName;
 	}
 
+	public void setAsyncSupported(boolean asyncSupported) {
+		_asyncSupported = asyncSupported;
+	}
+
 	public void setDescription(String description) {
 		_description = description;
 	}
@@ -164,6 +210,25 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 
 		PortletDictionary portletDictionary = (PortletDictionary) super
 			.toDictionary(portletId);
+
+		portletDictionary.put("javax.portlet.async-supported", _asyncSupported);
+
+		portletDictionary.putIfNotEmpty(
+			"javax.portlet.container-runtime-option",
+			_containerRuntimeOptions.entrySet()
+				.stream()
+				.map(
+						entry -> {
+							return entry.getValue()
+								.stream()
+								.map(
+										value ->
+											entry.getKey() +
+											prependDelimiter(";", value))
+								.collect(Collectors.toList());
+						})
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList()));
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache", _expirationCache);
@@ -224,6 +289,10 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 							.append(value)
 							.append("</value>"));
 
+			sb.append("<read-only>");
+			sb.append(descriptorPreference.isReadOnly());
+			sb.append("</read-only>");
+
 			sb.append("</preference>");
 		}
 
@@ -246,8 +315,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			_supportedPublicRenderParams.stream()
 				.map(
 						identifier ->
-							identifier + ";" +
-							getPublicRenderParameterNamespaceURI(identifier))
+							identifier +
+							prependDelimiter(
+								";",
+								getPublicRenderParameterNamespaceURI(
+									identifier)))
 				.collect(Collectors.toList()));
 
 		portletDictionary.putIfNotEmpty(
@@ -260,6 +332,9 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 								.stream()
 								.collect(Collectors.joining(",")))
 				.collect(Collectors.toList()));
+
+		portletDictionary.put(
+			"javax.portlet.supported-locale", _supportedLocales);
 
 		@SuppressWarnings("unchecked")
 		Set<String> supportedProcessingEvents = (Set<String>)
@@ -310,7 +385,14 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		return portletDictionary;
 	}
 
+	private boolean _asyncSupported;
 	private String _description;
+	private Map<String, List<String>> _containerRuntimeOptions = Collections
+		.emptyMap();
+	/*
+	private List<String> _customPortletModes = Collections.emptyList();
+	private List<String> _customWindowStates = Collections.emptyList();
+	*/
 	private List<DescriptorInitParam> _descriptorInitParams = Collections
 		.emptyList();
 	private List<DescriptorSecurityRoleRef> _descriptorSecurityRoleRefs =
@@ -327,6 +409,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		.emptyList();
 	private String _resourceBundle;
 	private List<String> _shortTitles = Collections.emptyList();
+	private List<String> _supportedLocales = Collections.emptyList();
 	private List<DescriptorSupportedEvent> _supportedProcessingEvents =
 		Collections.emptyList();
 	private List<DescriptorSupportedEvent> _supportedPublishingEvents =

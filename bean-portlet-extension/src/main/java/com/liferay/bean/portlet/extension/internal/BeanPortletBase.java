@@ -121,6 +121,16 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
+	public void addPortletDependency(PortletDependency portletDependency) {
+
+		if (_resourceDependencies.size() == 0) {
+			_resourceDependencies = new ArrayList<>();
+		}
+
+		_resourceDependencies.add(portletDependency);
+	}
+
+	@Override
 	public List<BeanMethod> getBeanMethods(MethodType methodType) {
 
 		if (methodType == MethodType.ACTION) {
@@ -152,6 +162,12 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		PortletDictionary portletDictionary = new PortletDictionary();
 
 		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
+
+		portletDictionary.putIfNotEmpty(
+			"javax.portlet.dependency",
+			getPortletDependencies().stream()
+				.map(portletDependency -> portletDependency.toString())
+				.collect(Collectors.toList()));
 
 		for (BeanMethod beanMethod : getBeanMethods(MethodType.ACTION)) {
 
@@ -269,8 +285,23 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		return namespaceURI;
 	}
 
+	protected List<PortletDependency> getPortletDependencies() {
+		return _resourceDependencies;
+	}
+
+	protected String prependDelimiter(String delimiter, String values) {
+
+		if ((values == null) || (values.length() == 0)) {
+			return "";
+		}
+
+		return delimiter + values;
+	}
+
 	private List<BeanMethod> _actionMethods = Collections.emptyList();
 	private BeanApp _beanApp;
+	private List<PortletDependency> _resourceDependencies = Collections
+		.emptyList();
 	private List<BeanMethod> _destroyMethods = Collections.emptyList();
 	private List<BeanMethod> _eventMethods = Collections.emptyList();
 	private List<BeanMethod> _headerMethods = Collections.emptyList();

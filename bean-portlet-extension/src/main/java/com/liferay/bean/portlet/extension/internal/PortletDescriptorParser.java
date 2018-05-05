@@ -14,6 +14,7 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -55,20 +56,26 @@ public class PortletDescriptorParser {
 
 		BeanApp beanApp = new BeanAppDecriptorImpl(specVersion);
 
-		String elementName;
-		String elementText = null;
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
-		EventDefinition eventDefinition = null;
+		// String customPortletMode = null;
+		// boolean customPortletModePortalManaged = false;
+		// String customWindowState = null;
+		DescriptorContainerRuntimeOption descriptorContainerRuntimeOption =
+			null;
 		DescriptorFilterMapping descriptorFilterMapping = null;
 		DescriptorInitParam descriptorInitParam = null;
-		String namespaceURI = null;
 		DescriptorPreference descriptorPreference = null;
+		DescriptorSupportedEvent descriptorProcessingEvent = null;
+		DescriptorSupportedEvent descriptorPublishingEvent = null;
+		DescriptorPortletDependency descriptorResourceDependency = null;
 		DescriptorSecurityRoleRef descriptorSecurityRoleRef = null;
-		DescriptorSupportedEvent supportedPublishingEvent = null;
-		PublicRenderParam publicRenderParam = null;
-		DescriptorSupportedEvent supportedProcessingEvent = null;
 		DescriptorSupports descriptorSupports = null;
+		String elementName;
+		String elementText = null;
+		EventDefinition eventDefinition = null;
+		String namespaceURI = null;
+		PublicRenderParam publicRenderParam = null;
 		InputStream inputStream = null;
 		XMLStreamReader xmlStreamReader = null;
 
@@ -85,7 +92,15 @@ public class PortletDescriptorParser {
 				if (eventType == XMLStreamConstants.START_ELEMENT) {
 					elementName = xmlStreamReader.getLocalName();
 
-					if ("event-definition".equals(elementName)) {
+					if ("container-runtime-option".equals(elementName)) {
+						descriptorContainerRuntimeOption =
+							new DescriptorContainerRuntimeOption();
+					}
+					else if ("dependency".equals(elementName)) {
+						descriptorResourceDependency =
+							new DescriptorPortletDependency();
+					}
+					else if ("event-definition".equals(elementName)) {
 						eventDefinition = new EventDefinitionDescriptorImpl(
 							beanApp);
 					}
@@ -113,11 +128,11 @@ public class PortletDescriptorParser {
 							new DescriptorSecurityRoleRef();
 					}
 					else if ("supported-processing-event".equals(elementName)) {
-						supportedProcessingEvent =
+						descriptorProcessingEvent =
 							new DescriptorSupportedEvent();
 					}
 					else if ("supported-publishing-event".equals(elementName)) {
-						supportedPublishingEvent =
+						descriptorPublishingEvent =
 							new DescriptorSupportedEvent();
 					}
 					else if ("supports".equals(elementName)) {
@@ -146,10 +161,46 @@ public class PortletDescriptorParser {
 							eventDefinition.getAliasQNames();
 						aliasQNames.add(new QName(namespaceURI, localPart));
 					}
+					else if ("async-supported".equals(elementName)) {
+						beanPortlet.setAsyncSupported(
+							GetterUtil.getBoolean(elementText));
+					}
+					else if ("container-runtime-option".equals(elementName)) {
+						beanPortlet.addContainerRuntimeOption(
+							descriptorContainerRuntimeOption.getName(),
+							descriptorContainerRuntimeOption.getValues());
+						descriptorContainerRuntimeOption = null;
+					}
+					/*
+					else if ("custom-portlet-mode".equals(elementName)) {
+
+						if (!customPortletModePortalManaged &&
+							(customPortletMode != null)) {
+							// beanPortlet.addCustomPortletMode(customPortletMode);
+						}
+
+						customPortletMode = null;
+						customPortletModePortalManaged = false;
+					}
+					else if ("custom-window-state".equals(elementName)) {
+
+						if (customWindowState != null) {
+
+							// beanPortlet.addCustomWindowState(customWindowState);
+							customWindowState = null;
+						}
+					}
+					*/
 					else if ("default-namespace".equals(elementName)) {
 						beanApp.setDefaultNamespace(elementText);
 					}
+					else if ("dependency".equals(elementName)) {
+						beanPortlet.addPortletDependency(
+							descriptorResourceDependency);
+						descriptorResourceDependency = null;
+					}
 					else if ("description".equals(elementName)) {
+
 						if (beanPortlet != null) {
 							beanPortlet.setDescription(elementText);
 						}
@@ -256,8 +307,15 @@ public class PortletDescriptorParser {
 					}
 					else if ("name".equals(elementName)) {
 
-						if (descriptorInitParam != null) {
+						if (descriptorContainerRuntimeOption != null) {
+							descriptorContainerRuntimeOption.setName(
+								elementText);
+						}
+						else if (descriptorInitParam != null) {
 							descriptorInitParam.setName(elementText);
+						}
+						else if (descriptorResourceDependency != null) {
+							descriptorResourceDependency.setName(elementText);
 						}
 						else if (publicRenderParam != null) {
 							publicRenderParam.setName(elementText);
@@ -265,13 +323,13 @@ public class PortletDescriptorParser {
 						else if (descriptorPreference != null) {
 							descriptorPreference.setName(elementText);
 						}
-						else if (supportedProcessingEvent != null) {
-							supportedProcessingEvent =
+						else if (descriptorProcessingEvent != null) {
+							descriptorProcessingEvent =
 								new DescriptorSupportedEvent(
 									beanApp, _getLocalPart(elementText));
 						}
-						else if (supportedPublishingEvent != null) {
-							supportedPublishingEvent =
+						else if (descriptorPublishingEvent != null) {
+							descriptorPublishingEvent =
 								new DescriptorSupportedEvent(
 									beanApp, _getLocalPart(elementText));
 						}
@@ -283,6 +341,12 @@ public class PortletDescriptorParser {
 								Integer.parseInt(elementText));
 						}
 					}
+					/*
+					else if ("portal-managed".equals(elementName)) {
+						customPortletModePortalManaged = GetterUtil.getBoolean(
+							elementText);
+					}
+					*/
 					else if ("portlet".equals(elementName)) {
 						beanPortlets.add(beanPortlet);
 						beanPortlet = null;
@@ -305,9 +369,15 @@ public class PortletDescriptorParser {
 						}
 					}
 					else if ("portlet-mode".equals(elementName)) {
+
 						if (descriptorSupports != null) {
 							descriptorSupports.addPortletMode(elementText);
 						}
+						/*
+						else {
+							customPortletMode = elementText;
+						}
+						*/
 					}
 					else if ("preference".equals(elementName)) {
 						beanPortlet.addPreference(descriptorPreference);
@@ -321,6 +391,13 @@ public class PortletDescriptorParser {
 							publicRenderParam);
 						publicRenderParam = null;
 					}
+					else if ("ready-only".equals(elementName)) {
+
+						if (descriptorPreference != null) {
+							descriptorPreference.setReadOnly(
+								GetterUtil.getBoolean(elementText));
+						}
+					}
 					else if ("qname".equals(elementName)) {
 
 						String prefix = _getPrefix(elementText);
@@ -332,16 +409,16 @@ public class PortletDescriptorParser {
 
 						String localPart = _getLocalPart(elementText);
 
-						if (supportedProcessingEvent != null) {
-							supportedProcessingEvent.setQName(
+						if (descriptorProcessingEvent != null) {
+							descriptorProcessingEvent.setQName(
 								new QName(namespaceURI, localPart));
 						}
 						else if (publicRenderParam != null) {
 							publicRenderParam.setQName(
 								new QName(namespaceURI, localPart));
 						}
-						else if (supportedPublishingEvent != null) {
-							supportedPublishingEvent.setQName(
+						else if (descriptorPublishingEvent != null) {
+							descriptorPublishingEvent.setQName(
 								new QName(namespaceURI, localPart));
 						}
 					}
@@ -354,6 +431,9 @@ public class PortletDescriptorParser {
 					else if ("role-name".equals(elementName)) {
 						descriptorSecurityRoleRef.setRoleName(elementText);
 					}
+					else if ("scope".equals(elementName)) {
+						descriptorResourceDependency.setScope(elementText);
+					}
 					else if ("security-role-ref".equals(elementName)) {
 						beanPortlet.addSecurityRoleRef(
 							descriptorSecurityRoleRef);
@@ -362,15 +442,18 @@ public class PortletDescriptorParser {
 					else if ("short-title".equals(elementName)) {
 						beanPortlet.addShortTitle(elementText);
 					}
+					else if ("supported-locale".equals(elementName)) {
+						beanPortlet.addSupportedLocale(elementText);
+					}
 					else if ("supported-processing-event".equals(elementName)) {
 						beanPortlet.addSupportedProcessingEvent(
-							supportedProcessingEvent);
-						supportedProcessingEvent = null;
+							descriptorProcessingEvent);
+						descriptorProcessingEvent = null;
 					}
 					else if ("supported-publishing-event".equals(elementName)) {
 						beanPortlet.addSupportedPublishingEvent(
-							supportedPublishingEvent);
-						supportedPublishingEvent = null;
+							descriptorPublishingEvent);
+						descriptorPublishingEvent = null;
 					}
 					else if (
 						"supported-public-render-parameter".equals(
@@ -387,7 +470,11 @@ public class PortletDescriptorParser {
 					}
 					else if ("value".equals(elementName)) {
 
-						if (descriptorInitParam != null) {
+						if (descriptorContainerRuntimeOption != null) {
+							descriptorContainerRuntimeOption.addValue(
+								elementText);
+						}
+						else if (descriptorInitParam != null) {
 							descriptorInitParam.setValue(elementText);
 						}
 						else if (descriptorPreference != null) {
@@ -397,10 +484,19 @@ public class PortletDescriptorParser {
 					else if ("value-type".equals(elementName)) {
 						eventDefinition.setValueType(elementText);
 					}
+					else if ("version".equals(elementName)) {
+						descriptorResourceDependency.setVersion(elementText);
+					}
 					else if ("window-state".equals(elementName)) {
+
 						if (descriptorSupports != null) {
 							descriptorSupports.addWindowState(elementText);
 						}
+						/*
+						else {
+							customWindowState = elementText;
+						}
+						*/
 					}
 				}
 			}

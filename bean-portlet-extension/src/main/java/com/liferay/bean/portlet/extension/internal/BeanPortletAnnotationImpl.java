@@ -16,6 +16,7 @@ package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -62,6 +63,14 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 						Collectors.toMap(
 							Map.Entry::getKey, Map.Entry::getValue)));
 		}
+
+		Arrays.stream(portletConfiguration.dependencies())
+			.forEach(
+				dependency ->
+					addPortletDependency(
+						new PortletDependencyImpl(
+							dependency.name(), dependency.scope(),
+							dependency.version())));
 	}
 
 	@Override
@@ -79,6 +88,25 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 
 		PortletDictionary portletDictionary = (PortletDictionary) super
 			.toDictionary(portletId);
+
+		portletDictionary.put(
+			"javax.portlet.async-supported",
+			_portletConfiguration.asyncSupported());
+
+		portletDictionary.putIfNotEmpty(
+			"javax.portlet.container-runtime-option",
+			Arrays.stream(_portletConfiguration.runtimeOptions())
+				.map(
+						runtimeOption -> {
+							return Arrays.stream(runtimeOption.values())
+								.map(
+										value ->
+											runtimeOption.name() +
+											prependDelimiter(";", value))
+								.collect(Collectors.toList());
+						})
+				.flatMap(Collection::stream)
+				.collect(Collectors.toList()));
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache",
@@ -141,6 +169,10 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 							.append(value)
 							.append("</value>"));
 
+			sb.append("<read-only>");
+			sb.append(preference.isReadOnly());
+			sb.append("</read-only>");
+
 			sb.append("</preference>");
 		}
 
@@ -156,9 +188,13 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.security-role-ref",
 			Arrays.stream(_portletConfiguration.roleRefs())
-				.map(roleRef ->
-							roleRef.roleName())
+				.map(roleRef -> roleRef.roleName())
 				.collect(Collectors.joining(",")));
+
+		portletDictionary.put(
+			"javax.portlet.supported-locale",
+			Arrays.stream(_portletConfiguration.supportedLocales())
+				.collect(Collectors.toList()));
 
 		portletDictionary.put(
 			"javax.portlet.supported-public-render-parameter",
@@ -209,15 +245,6 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 		}
 
 		return defaultValue;
-	}
-
-	protected String prependDelimiter(String delimiter, String values) {
-
-		if ((values == null) || (values.length() == 0)) {
-			return "";
-		}
-
-		return delimiter + values;
 	}
 
 	private Map<String, String> _liferayPortletConfigurationProperties;
