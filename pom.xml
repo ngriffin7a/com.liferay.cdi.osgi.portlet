@@ -22,6 +22,7 @@
 	<modules>
 		<module>bean-portlet-extension</module>
 		<module>bean-demo1-portlet</module>
+		<module>generic-demo1-portlet</module>
 	</modules>
 
 	<build>

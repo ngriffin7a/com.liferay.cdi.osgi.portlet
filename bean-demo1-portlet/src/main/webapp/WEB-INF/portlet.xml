@@ -54,6 +54,17 @@
 		</supported-publishing-event>
 		<supported-public-render-parameter>myPRP1</supported-public-render-parameter>
 		<supported-public-render-parameter>myPRP2</supported-public-render-parameter>
+		<dependency>
+			<name>jquery.js</name>
+			<scope>com.jquery</scope>
+			<version>2.1.1</version>
+		</dependency>
+		<dependency>
+			<name>jsutil.js</name>
+			<scope>com.mycompany</scope>
+			<version>1.0.0</version>
+		</dependency>
+		<async-supported>true</async-supported>
 	</portlet>
 	<filter>
 		<filter-name>OtherPortletFilter</filter-name>

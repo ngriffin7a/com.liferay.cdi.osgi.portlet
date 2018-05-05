@@ -45,6 +45,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderURL;
 import javax.portlet.WindowState;
+import javax.portlet.annotations.Dependency;
 import javax.portlet.annotations.PortletConfiguration;
 
 import javax.servlet.http.Cookie;
@@ -56,7 +57,17 @@ import org.slf4j.LoggerFactory;
  * @author Neil Griffin
  */
 @ApplicationScoped
-@PortletConfiguration(portletName = "fooBeanPortlet")
+@PortletConfiguration(
+	portletName = "fooBeanPortlet",
+	dependencies = {
+			@Dependency(
+				name = "PortletHub", scope = "javax.portlet", version = "3.0.0"
+			),
+			@Dependency(
+				name = "yaya.js", scope = "com.yourcompany", version = "1.2.3"
+			)
+		}
+)
 @LiferayPortletConfiguration(
 	portletName = "fooBeanPortlet",
 	properties = {
