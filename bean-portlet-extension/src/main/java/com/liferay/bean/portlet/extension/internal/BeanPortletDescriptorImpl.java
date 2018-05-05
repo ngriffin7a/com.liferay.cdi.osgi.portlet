@@ -15,7 +15,6 @@
 package com.liferay.bean.portlet.extension.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -44,6 +43,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		_containerRuntimeOptions.put(name, values);
 	}
 
+	//J-
 	/*
 	public void addCustomPortletMode(String customPortletMode) {
 
@@ -63,6 +63,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		_customWindowStates.add(customWindowState);
 	}
 	*/
+	//J+
 
 	public void addInitParam(DescriptorInitParam descriptorInitParam) {
 
@@ -389,10 +390,12 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 	private String _description;
 	private Map<String, List<String>> _containerRuntimeOptions = Collections
 		.emptyMap();
+	//J-
 	/*
 	private List<String> _customPortletModes = Collections.emptyList();
 	private List<String> _customWindowStates = Collections.emptyList();
 	*/
+	//J+
 	private List<DescriptorInitParam> _descriptorInitParams = Collections
 		.emptyList();
 	private List<DescriptorSecurityRoleRef> _descriptorSecurityRoleRefs =

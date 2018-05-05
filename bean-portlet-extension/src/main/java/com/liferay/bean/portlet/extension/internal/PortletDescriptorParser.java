@@ -58,9 +58,11 @@ public class PortletDescriptorParser {
 
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
+		//J-
 		// String customPortletMode = null;
 		// boolean customPortletModePortalManaged = false;
 		// String customWindowState = null;
+		//J+
 		DescriptorContainerRuntimeOption descriptorContainerRuntimeOption =
 			null;
 		DescriptorFilterMapping descriptorFilterMapping = null;
@@ -171,6 +173,7 @@ public class PortletDescriptorParser {
 							descriptorContainerRuntimeOption.getValues());
 						descriptorContainerRuntimeOption = null;
 					}
+					//J-
 					/*
 					else if ("custom-portlet-mode".equals(elementName)) {
 
@@ -191,6 +194,7 @@ public class PortletDescriptorParser {
 						}
 					}
 					*/
+					//J+
 					else if ("default-namespace".equals(elementName)) {
 						beanApp.setDefaultNamespace(elementText);
 					}
@@ -341,12 +345,14 @@ public class PortletDescriptorParser {
 								Integer.parseInt(elementText));
 						}
 					}
+					//J-
 					/*
 					else if ("portal-managed".equals(elementName)) {
 						customPortletModePortalManaged = GetterUtil.getBoolean(
 							elementText);
 					}
 					*/
+					//J+
 					else if ("portlet".equals(elementName)) {
 						beanPortlets.add(beanPortlet);
 						beanPortlet = null;
@@ -373,11 +379,13 @@ public class PortletDescriptorParser {
 						if (descriptorSupports != null) {
 							descriptorSupports.addPortletMode(elementText);
 						}
+						//J-
 						/*
 						else {
 							customPortletMode = elementText;
 						}
 						*/
+						//J+
 					}
 					else if ("preference".equals(elementName)) {
 						beanPortlet.addPreference(descriptorPreference);
@@ -492,11 +500,13 @@ public class PortletDescriptorParser {
 						if (descriptorSupports != null) {
 							descriptorSupports.addWindowState(elementText);
 						}
+						//J-
 						/*
 						else {
 							customWindowState = elementText;
 						}
 						*/
+						//J+
 					}
 				}
 			}
