@@ -163,6 +163,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
 
+		portletDictionary.putIfNotNull("javax.portlet.default-namespace",
+			_beanApp.getDefaultNamespace());
+
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.dependency",
 			getPortletDependencies().stream()
