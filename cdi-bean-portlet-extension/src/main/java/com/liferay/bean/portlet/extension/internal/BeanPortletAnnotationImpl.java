@@ -181,7 +181,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 		portletDictionary.putIfNotNull(
 			"javax.portlet.preferences", sb.toString());
 
-		portletDictionary.putIfNotNull(
+		portletDictionary.putIfNotEmpty(
 			"javax.portlet.resource-bundle",
 			_portletConfiguration.resourceBundle());
 

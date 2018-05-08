@@ -12,8 +12,8 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>com.liferay.bean.portlet.extension</artifactId>
-	<name>bean-portlet-extension</name>
+	<artifactId>com.liferay.cdi.bean.portlet.extension</artifactId>
+	<name>cdi-bean-portlet-extension</name>
 
 	<build>
 		<plugins>

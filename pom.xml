@@ -20,9 +20,9 @@
 	<url>http://www.liferay.com</url>
 
 	<modules>
-		<module>bean-portlet-extension</module>
-		<module>bean-demo1-portlet</module>
-		<module>generic-demo1-portlet</module>
+		<module>cdi-bean-portlet-extension</module>
+		<module>demo1-cdi-bean-portlet</module>
+		<module>demo2-generic-portlet</module>
 	</modules>
 
 	<build>

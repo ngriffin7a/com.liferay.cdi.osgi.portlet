@@ -13,8 +13,8 @@
 	</parent>
 
 	<packaging>war</packaging>
-	<artifactId>com.liferay.generic.demo1.portlet</artifactId>
-	<name>generic-demo1-portlet</name>
+	<artifactId>com.liferay.demo2.generic.portlet</artifactId>
+	<name>demo2-generic-portlet</name>
 
 	<build>
 		<plugins>

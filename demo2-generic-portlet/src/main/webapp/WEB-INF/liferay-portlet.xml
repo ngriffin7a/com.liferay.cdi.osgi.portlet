@@ -4,8 +4,8 @@
 <liferay-portlet-app>
 	<portlet>
 		<portlet-name>generic_demo1_portlet</portlet-name>
-		<cdn-portlet-dependency-path-css>yayaCSS</cdn-portlet-dependency-path-css>
-		<cdn-portlet-dependency-path-javascript>mamaJS</cdn-portlet-dependency-path-javascript>
+		<cdn-portlet-css-dependencies-path>yayaCSS</cdn-portlet-css-dependencies-path>
+		<cdn-portlet-javascript-dependencies-path>mamaJS</cdn-portlet-javascript-dependencies-path>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
