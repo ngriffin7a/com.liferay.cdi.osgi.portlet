@@ -37,6 +37,11 @@ public class BeanPortletDefaultImpl extends BeanPortletBase {
 	}
 
 	@Override
+	public String getResourceBundle() {
+		return null;
+	}
+
+	@Override
 	public Dictionary<String, Object> toDictionary(String portletId) {
 		PortletDictionary portletDictionary = (PortletDictionary) super
 			.toDictionary(portletId);

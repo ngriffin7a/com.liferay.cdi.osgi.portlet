@@ -25,18 +25,20 @@ public interface BeanPortlet {
 
 	public void addBeanMethod(BeanMethod beanMethod);
 
-	public void addPortletDependency(PortletDependency portletDependency);
-
 	public void addLiferayConfiguration(
 			Map<String, String> liferayConfiguration);
 
 	public void addLiferayConfiguration(String name, String value);
+
+	public void addPortletDependency(PortletDependency portletDependency);
 
 	public List<BeanMethod> getBeanMethods(MethodType methodType);
 
 	public String getPortletClass();
 
 	public String getPortletName();
+
+	public String getResourceBundle();
 
 	public Dictionary<String, Object> toDictionary(String portletId);
 }

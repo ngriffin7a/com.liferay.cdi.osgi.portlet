@@ -16,10 +16,16 @@ package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.portal.kernel.model.PortletConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -30,6 +36,7 @@ import javax.portlet.filter.PortletFilter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -77,12 +84,11 @@ public class RegistrationUtil {
 					beanFilter.toDictionary(portletName)));
 		}
 
-		Set<String> beanFilterNames =
-			(Set<String>)servletContext.getAttribute(
-				"com.liferay.beanFilterNames");
+		Set<String> beanFilterNames = (Set<String>) servletContext.getAttribute(
+			"com.liferay.beanFilterNames");
 
 		if (beanFilterNames == null) {
-			beanFilterNames= new HashSet<>();
+			beanFilterNames = new HashSet<>();
 		}
 
 		beanFilterNames.add(beanFilter.getFilterName());
@@ -129,12 +135,11 @@ public class RegistrationUtil {
 
 				servletRegistration.addMapping("/portlet-servlet/*");
 
-				Set<String> beanPortletIds =
-					(Set<String>)servletContext.getAttribute(
-						"com.liferay.beanPortletIds");
+				Set<String> beanPortletIds = (Set<String>)
+					servletContext.getAttribute("com.liferay.beanPortletIds");
 
 				if (beanPortletIds == null) {
-					beanPortletIds= new HashSet<>();
+					beanPortletIds = new HashSet<>();
 				}
 
 				beanPortletIds.add(portletId);
@@ -147,6 +152,32 @@ public class RegistrationUtil {
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);
+		}
+
+		return null;
+	}
+
+	public static ServiceRegistration<ResourceBundleLoader> registerResourceBundleLoader(
+			BundleContext bundleContext, BeanPortlet beanPortlet,
+			ServletContext servletContext) {
+
+		String resourceBundle = beanPortlet.getResourceBundle();
+
+		if (Validator.isNotNull(resourceBundle)) {
+
+			ResourceBundleLoader resourceBundleLoader = ResourceBundleUtil
+				.getResourceBundleLoader(
+					resourceBundle, servletContext.getClassLoader());
+
+			Dictionary<String, Object> properties = new Hashtable<>();
+
+			properties.put("resource.bundle.base.name", resourceBundle);
+			properties.put("service.ranking", Integer.MIN_VALUE);
+			properties.put(
+				"servlet.context.name", servletContext.getServletContextName());
+
+			return bundleContext.registerService(
+				ResourceBundleLoader.class, resourceBundleLoader, properties);
 		}
 
 		return null;

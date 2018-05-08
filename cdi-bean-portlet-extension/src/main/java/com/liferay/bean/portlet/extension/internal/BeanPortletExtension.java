@@ -17,6 +17,7 @@ package com.liferay.bean.portlet.extension.internal;
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import com.liferay.bean.portlet.extension.LiferayPortletConfigurations;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -293,6 +294,16 @@ public class BeanPortletExtension implements Extension {
 								servletContext))
 				.collect(Collectors.toList());
 
+		_resourceBundleLoaderRegistrations = _beanPortlets
+			.entrySet()
+				.stream()
+				.map(
+						entry ->
+							RegistrationUtil.registerResourceBundleLoader(
+								bundleContext, entry.getValue(),
+								servletContext))
+				.collect(Collectors.toList());
+
 		_beanFilters.stream()
 			.forEach(
 				beanFilter ->
@@ -516,14 +527,21 @@ public class BeanPortletExtension implements Extension {
 			@Destroyed(ApplicationScoped.class)
 			Object ignore) {
 
-		_portletRegistrations.removeIf(
+		_filterRegistrations.removeIf(
 			serviceRegistration -> {
 				serviceRegistration.unregister();
 
 				return true;
 			});
 
-		_filterRegistrations.removeIf(
+		_resourceBundleLoaderRegistrations.removeIf(
+			serviceRegistration -> {
+				serviceRegistration.unregister();
+
+				return true;
+			});
+
+		_portletRegistrations.removeIf(
 			serviceRegistration -> {
 				serviceRegistration.unregister();
 
@@ -768,5 +786,7 @@ public class BeanPortletExtension implements Extension {
 	private List<Class<?>> _portletConfigurationsClasses = new ArrayList<>();
 	private List<Class<?>> _portletLifecycleFilterClasses = new ArrayList<>();
 	private List<ScannedMethod> _renderMethods = new ArrayList<>();
+	private List<ServiceRegistration<ResourceBundleLoader>> _resourceBundleLoaderRegistrations =
+		new ArrayList<>();
 	private List<ScannedMethod> _serveResourceMethods = new ArrayList<>();
 }

@@ -178,6 +178,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		return _portletName;
 	}
 
+	@Override
+	public String getResourceBundle() {
+		return _resourceBundle;
+	}
+
 	public void setAsyncSupported(boolean asyncSupported) {
 		_asyncSupported = asyncSupported;
 	}

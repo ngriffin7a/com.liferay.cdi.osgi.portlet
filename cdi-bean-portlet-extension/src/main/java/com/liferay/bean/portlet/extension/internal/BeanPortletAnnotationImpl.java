@@ -84,6 +84,11 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 	}
 
 	@Override
+	public String getResourceBundle() {
+		return _portletConfiguration.resourceBundle();
+	}
+
+	@Override
 	public Dictionary<String, Object> toDictionary(String portletId) {
 
 		PortletDictionary portletDictionary = (PortletDictionary) super
