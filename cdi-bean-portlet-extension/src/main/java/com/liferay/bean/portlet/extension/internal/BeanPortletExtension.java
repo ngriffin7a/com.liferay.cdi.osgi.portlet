@@ -17,7 +17,6 @@ package com.liferay.bean.portlet.extension.internal;
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import com.liferay.bean.portlet.extension.LiferayPortletConfigurations;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -87,6 +86,7 @@ import javax.portlet.filter.PortletFilter;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -287,16 +287,15 @@ public class BeanPortletExtension implements Extension {
 
 		_portletRegistrations = _beanPortlets.entrySet()
 			.stream()
-				.map(
-						entry ->
-							RegistrationUtil.registerBeanPortlet(
-								bundleContext, entry.getValue(),
-								servletContext))
-				.collect(Collectors.toList());
+			.map(
+				entry ->
+					RegistrationUtil.registerBeanPortlet(
+						bundleContext, entry.getValue(),
+						servletContext))
+			.collect(Collectors.toList());
 
-		_resourceBundleLoaderRegistrations = _beanPortlets
-			.entrySet()
-				.stream()
+		_resourceBundleLoaderRegistrations = _beanPortlets.entrySet()
+			.stream()
 				.map(
 						entry ->
 							RegistrationUtil.registerResourceBundleLoader(
@@ -534,14 +533,14 @@ public class BeanPortletExtension implements Extension {
 				return true;
 			});
 
-		_resourceBundleLoaderRegistrations.removeIf(
+		_portletRegistrations.removeIf(
 			serviceRegistration -> {
 				serviceRegistration.unregister();
 
 				return true;
 			});
 
-		_portletRegistrations.removeIf(
+		_resourceBundleLoaderRegistrations.removeIf(
 			serviceRegistration -> {
 				serviceRegistration.unregister();
 
@@ -786,7 +785,7 @@ public class BeanPortletExtension implements Extension {
 	private List<Class<?>> _portletConfigurationsClasses = new ArrayList<>();
 	private List<Class<?>> _portletLifecycleFilterClasses = new ArrayList<>();
 	private List<ScannedMethod> _renderMethods = new ArrayList<>();
-	private List<ServiceRegistration<ResourceBundleLoader>> _resourceBundleLoaderRegistrations =
-		new ArrayList<>();
+	private List<ServiceRegistration<ResourceBundleLoader>>
+		_resourceBundleLoaderRegistrations = new ArrayList<>();
 	private List<ScannedMethod> _serveResourceMethods = new ArrayList<>();
 }
