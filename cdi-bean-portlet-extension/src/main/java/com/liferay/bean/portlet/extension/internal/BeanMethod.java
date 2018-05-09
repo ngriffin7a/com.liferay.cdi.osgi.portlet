@@ -24,9 +24,13 @@ import javax.portlet.PortletMode;
 import javax.portlet.ProcessAction;
 import javax.portlet.RenderMode;
 import javax.portlet.annotations.ActionMethod;
+import javax.portlet.annotations.EventMethod;
 import javax.portlet.annotations.HeaderMethod;
+import javax.portlet.annotations.PortletQName;
 import javax.portlet.annotations.RenderMethod;
 import javax.portlet.annotations.ServeResourceMethod;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Neil Griffin
@@ -65,28 +69,6 @@ public class BeanMethod {
 		}
 
 		return processAction.name();
-	}
-
-	public PortletMode getPortletMode() {
-
-		RenderMethod renderMethod = _method.getAnnotation(RenderMethod.class);
-
-		if (renderMethod != null) {
-
-			String portletMode = renderMethod.portletMode();
-
-			if (portletMode != null) {
-				return new PortletMode(portletMode);
-			}
-		}
-
-		RenderMode renderMode = _method.getAnnotation(RenderMode.class);
-
-		if (renderMode == null) {
-			return null;
-		}
-
-		return new PortletMode(renderMode.name());
 	}
 
 	public Class<?> getBeanClass() {
@@ -138,6 +120,28 @@ public class BeanMethod {
 		return _method.getParameterCount();
 	}
 
+	public PortletMode getPortletMode() {
+
+		RenderMethod renderMethod = _method.getAnnotation(RenderMethod.class);
+
+		if (renderMethod != null) {
+
+			String portletMode = renderMethod.portletMode();
+
+			if (portletMode != null) {
+				return new PortletMode(portletMode);
+			}
+		}
+
+		RenderMode renderMode = _method.getAnnotation(RenderMode.class);
+
+		if (renderMode == null) {
+			return null;
+		}
+
+		return new PortletMode(renderMode.name());
+	}
+
 	public MethodType getType() {
 		return _type;
 	}
@@ -155,6 +159,29 @@ public class BeanMethod {
 		catch (IllegalArgumentException e) {
 			throw new InvocationTargetException(e);
 		}
+	}
+
+	public boolean isEventProcessor(QName qName) {
+
+		EventMethod eventMethod = _method.getAnnotation(EventMethod.class);
+
+		if (eventMethod != null) {
+
+			PortletQName[] portletQNames = eventMethod.processingEvents();
+
+			for (PortletQName portletQName : portletQNames) {
+
+				if (portletQName.localPart()
+						.equals(qName.getLocalPart()) &&
+					portletQName.namespaceURI()
+						.equals(qName.getNamespaceURI())) {
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private BeanManager _beanManager;

@@ -21,10 +21,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.portlet.ActionParameters;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.Event;
 import javax.portlet.EventPortlet;
 import javax.portlet.EventRequest;
 import javax.portlet.EventResponse;
@@ -44,6 +46,8 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.portlet.ResourceServingPortlet;
+
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +109,14 @@ public class BeanPortletInvoker implements EventPortlet, HeaderPortlet, Portlet,
 			EventRequest eventRequest, EventResponse eventResponse)
 		throws PortletException, IOException {
 
-		invokeBeanMethods(eventRequest, eventResponse, _eventMethods);
+		Event event = eventRequest.getEvent();
+
+		List<BeanMethod> eventMethods = _eventMethods.stream()
+			.filter(beanMethod ->
+						beanMethod.isEventProcessor(event.getQName()))
+				.collect(Collectors.toList());
+
+		invokeBeanMethods(eventRequest, eventResponse, eventMethods);
 	}
 
 	@Override
