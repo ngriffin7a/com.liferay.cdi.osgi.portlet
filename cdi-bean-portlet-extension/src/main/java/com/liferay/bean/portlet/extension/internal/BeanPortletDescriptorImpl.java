@@ -235,9 +235,9 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 								.stream()
 								.map(
 										value ->
-											entry.getKey() +
 											PortletDictionaryUtil
-												.prependDelimiter(";", value))
+												.formatNameValuePair(
+													entry.getKey(), value))
 								.collect(Collectors.toList());
 						})
 				.flatMap(Collection::stream)
@@ -334,9 +334,8 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			_supportedPublicRenderParams.stream()
 				.map(
 						identifier ->
-							identifier +
-							PortletDictionaryUtil.prependDelimiter(
-								";",
+							PortletDictionaryUtil.formatNameValuePair(
+								identifier,
 								getPublicRenderParameterNamespaceURI(
 									identifier)))
 				.collect(Collectors.toList()));

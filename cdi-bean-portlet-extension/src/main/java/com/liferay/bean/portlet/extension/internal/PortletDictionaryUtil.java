@@ -14,17 +14,20 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.portal.kernel.util.Validator;
+
 /**
  * @author Neil Griffin
  */
 public class PortletDictionaryUtil {
 
-	public static String prependDelimiter(String delimiter, String values) {
+	public static String formatNameValuePair(String name, String value) {
 
-		if ((values == null) || (values.length() == 0)) {
-			return "";
+		if (Validator.isNull(value)) {
+			return name;
 		}
 
-		return delimiter + values;
+		return name + CharPool.SEMICOLON + value;
 	}
 }

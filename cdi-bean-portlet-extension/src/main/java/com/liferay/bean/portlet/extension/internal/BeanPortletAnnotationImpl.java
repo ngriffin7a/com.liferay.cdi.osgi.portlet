@@ -121,9 +121,9 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 								.stream()
 								.map(
 										value ->
-											entry.getKey() +
 											PortletDictionaryUtil
-												.prependDelimiter(";", value))
+												.formatNameValuePair(
+													entry.getKey(), value))
 								.collect(Collectors.toList());
 						})
 				.flatMap(Collection::stream)
@@ -167,9 +167,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			Arrays.stream(_portletConfiguration.supports())
 				.map(
 						supports ->
-							supports.mimeType() +
-							PortletDictionaryUtil.prependDelimiter(
-								";",
+							PortletDictionaryUtil.formatNameValuePair(
+								supports.mimeType(),
 								Arrays.stream(supports.portletModes())
 									.filter(
 											portletMode ->
@@ -228,9 +227,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			Arrays.stream(_portletConfiguration.publicParams())
 				.map(
 						identifier ->
-							identifier +
-							PortletDictionaryUtil.prependDelimiter(
-								";",
+							PortletDictionaryUtil.formatNameValuePair(
+								identifier,
 								getPublicRenderParameterNamespaceURI(
 									identifier)))
 				.collect(Collectors.toList()));
@@ -240,9 +238,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			Arrays.stream(_portletConfiguration.supports())
 				.map(
 						supports ->
-							supports.mimeType() +
-							PortletDictionaryUtil.prependDelimiter(
-								";",
+							PortletDictionaryUtil.formatNameValuePair(
+								supports.mimeType(),
 								Arrays.stream(supports.windowStates())
 									.collect(Collectors.joining(","))))
 				.collect(Collectors.toList()));
