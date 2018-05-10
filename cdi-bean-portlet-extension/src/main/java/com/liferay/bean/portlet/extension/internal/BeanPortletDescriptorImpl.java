@@ -219,9 +219,15 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 
 		portletDictionary.put("javax.portlet.async-supported", _asyncSupported);
 
+		BeanApp beanApp = getBeanApp();
+		Map<String, List<String>> containerRuntimeOptions = new HashMap<>(
+			beanApp.getContainerRuntimeOptions());
+
+		containerRuntimeOptions.putAll(_containerRuntimeOptions);
+
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.container-runtime-option",
-			_containerRuntimeOptions.entrySet()
+			containerRuntimeOptions.entrySet()
 				.stream()
 				.map(
 						entry -> {
@@ -230,7 +236,8 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 								.map(
 										value ->
 											entry.getKey() +
-											prependDelimiter(";", value))
+											PortletDictionaryUtil
+												.prependDelimiter(";", value))
 								.collect(Collectors.toList());
 						})
 				.flatMap(Collection::stream)
@@ -322,7 +329,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 				.map(
 						identifier ->
 							identifier +
-							prependDelimiter(
+							PortletDictionaryUtil.prependDelimiter(
 								";",
 								getPublicRenderParameterNamespaceURI(
 									identifier)))

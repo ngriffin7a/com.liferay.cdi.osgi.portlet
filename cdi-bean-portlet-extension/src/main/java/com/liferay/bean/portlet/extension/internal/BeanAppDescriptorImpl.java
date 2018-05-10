@@ -29,6 +29,11 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 	}
 
 	@Override
+	public Map<String, List<String>> getContainerRuntimeOptions() {
+		return _containerRuntimeOptions;
+	}
+
+	@Override
 	public List<EventDefinition> getEventDefinitions() {
 		return _eventDefinitions;
 	}
@@ -43,6 +48,8 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 		return _specVersion;
 	}
 
+	private Map<String, List<String>> _containerRuntimeOptions =
+		new HashMap<>();
 	private List<EventDefinition> _eventDefinitions = new ArrayList<>();
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();

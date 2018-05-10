@@ -131,6 +131,11 @@ public abstract class BeanPortletBase implements BeanPortlet {
 	}
 
 	@Override
+	public BeanApp getBeanApp() {
+		return _beanApp;
+	}
+
+	@Override
 	public List<BeanMethod> getBeanMethods(MethodType methodType) {
 
 		if (methodType == MethodType.ACTION) {
@@ -161,16 +166,16 @@ public abstract class BeanPortletBase implements BeanPortlet {
 
 		PortletDictionary portletDictionary = new PortletDictionary();
 
-		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
-
-		portletDictionary.putIfNotNull("javax.portlet.default-namespace",
-			_beanApp.getDefaultNamespace());
+		portletDictionary.putIfNotNull(
+			"javax.portlet.default-namespace", _beanApp.getDefaultNamespace());
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.dependency",
 			getPortletDependencies().stream()
 				.map(portletDependency -> portletDependency.toString())
 				.collect(Collectors.toList()));
+
+		portletDictionary.putIfNotNull("javax.portlet.name", portletId);
 
 		for (BeanMethod beanMethod : getBeanMethods(MethodType.ACTION)) {
 
@@ -262,6 +267,10 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		return _liferayConfiguration;
 	}
 
+	protected List<PortletDependency> getPortletDependencies() {
+		return _resourceDependencies;
+	}
+
 	protected String getPublicRenderParameterNamespaceURI(String id) {
 
 		Map<String, PublicRenderParam> publicRenderParameterMap =
@@ -286,19 +295,6 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		}
 
 		return namespaceURI;
-	}
-
-	protected List<PortletDependency> getPortletDependencies() {
-		return _resourceDependencies;
-	}
-
-	protected String prependDelimiter(String delimiter, String values) {
-
-		if ((values == null) || (values.length() == 0)) {
-			return "";
-		}
-
-		return delimiter + values;
 	}
 
 	private List<BeanMethod> _actionMethods = Collections.emptyList();

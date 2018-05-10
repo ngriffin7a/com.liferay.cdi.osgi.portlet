@@ -54,7 +54,7 @@ public class PortletDescriptorParser {
 		String specVersion = _validateXML(
 			xmlInputFactory, portletDescriptorURL);
 
-		BeanApp beanApp = new BeanAppDecriptorImpl(specVersion);
+		BeanApp beanApp = new BeanAppDescriptorImpl(specVersion);
 
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
@@ -169,9 +169,20 @@ public class PortletDescriptorParser {
 							GetterUtil.getBoolean(elementText));
 					}
 					else if ("container-runtime-option".equals(elementName)) {
-						beanPortlet.addContainerRuntimeOption(
-							descriptorContainerRuntimeOption.getName(),
-							descriptorContainerRuntimeOption.getValues());
+
+						if (beanPortlet == null) {
+							Map<String, List<String>> containerRuntimeOptions =
+								beanApp.getContainerRuntimeOptions();
+							containerRuntimeOptions.put(
+								descriptorContainerRuntimeOption.getName(),
+								descriptorContainerRuntimeOption.getValues());
+						}
+						else {
+							beanPortlet.addContainerRuntimeOption(
+								descriptorContainerRuntimeOption.getName(),
+								descriptorContainerRuntimeOption.getValues());
+						}
+
 						descriptorContainerRuntimeOption = null;
 					}
 

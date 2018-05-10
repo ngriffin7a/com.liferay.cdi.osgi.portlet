@@ -32,6 +32,8 @@ public interface BeanPortlet {
 
 	public void addPortletDependency(PortletDependency portletDependency);
 
+	public BeanApp getBeanApp();
+
 	public List<BeanMethod> getBeanMethods(MethodType methodType);
 
 	public String getPortletClass();

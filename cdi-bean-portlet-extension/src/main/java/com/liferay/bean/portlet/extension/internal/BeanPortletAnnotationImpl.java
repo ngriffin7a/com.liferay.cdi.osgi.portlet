@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -98,16 +99,30 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			"javax.portlet.async-supported",
 			_portletConfiguration.asyncSupported());
 
+		BeanApp beanApp = getBeanApp();
+		Map<String, List<String>> containerRuntimeOptions = new HashMap<>(
+			beanApp.getContainerRuntimeOptions());
+
+		Arrays.stream(_portletConfiguration.runtimeOptions())
+			.forEach(
+				runtimeOption ->
+					containerRuntimeOptions.put(
+						runtimeOption.name(),
+						Arrays.asList(runtimeOption.values())));
+
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.container-runtime-option",
-			Arrays.stream(_portletConfiguration.runtimeOptions())
+			containerRuntimeOptions.entrySet()
+				.stream()
 				.map(
-						runtimeOption -> {
-							return Arrays.stream(runtimeOption.values())
+						entry -> {
+							return entry.getValue()
+								.stream()
 								.map(
 										value ->
-											runtimeOption.name() +
-											prependDelimiter(";", value))
+											entry.getKey() +
+											PortletDictionaryUtil
+												.prependDelimiter(";", value))
 								.collect(Collectors.toList());
 						})
 				.flatMap(Collection::stream)
@@ -150,7 +165,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 				.map(
 						supports ->
 							supports.mimeType() +
-							prependDelimiter(
+							PortletDictionaryUtil.prependDelimiter(
 								";",
 								Arrays.stream(supports.portletModes())
 									.collect(Collectors.joining(","))))
@@ -207,7 +222,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 				.map(
 						identifier ->
 							identifier +
-							prependDelimiter(
+							PortletDictionaryUtil.prependDelimiter(
 								";",
 								getPublicRenderParameterNamespaceURI(
 									identifier)))
@@ -219,7 +234,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 				.map(
 						supports ->
 							supports.mimeType() +
-							prependDelimiter(
+							PortletDictionaryUtil.prependDelimiter(
 								";",
 								Arrays.stream(supports.windowStates())
 									.collect(Collectors.joining(","))))

@@ -26,6 +26,11 @@ import javax.portlet.annotations.PortletApplication;
 public class BeanAppDefaultImpl extends BeanAppBase {
 
 	@Override
+	public Map<String, List<String>> getContainerRuntimeOptions() {
+		return Collections.emptyMap();
+	}
+
+	@Override
 	public List<EventDefinition> getEventDefinitions() {
 		return Collections.emptyList();
 	}

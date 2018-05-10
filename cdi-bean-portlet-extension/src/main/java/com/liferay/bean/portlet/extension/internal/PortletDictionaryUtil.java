@@ -14,23 +14,17 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Neil Griffin
  */
-public interface BeanApp {
+public class PortletDictionaryUtil {
 
-	public Map<String, List<String>> getContainerRuntimeOptions();
+	public static String prependDelimiter(String delimiter, String values) {
 
-	public String getDefaultNamespace();
+		if ((values == null) || (values.length() == 0)) {
+			return "";
+		}
 
-	public List<EventDefinition> getEventDefinitions();
-
-	public Map<String, PublicRenderParam> getPublicRenderParameterMap();
-
-	public String getSpecVersion();
-
-	public void setDefaultNamespace(String defaultNamespace);
+		return delimiter + values;
+	}
 }

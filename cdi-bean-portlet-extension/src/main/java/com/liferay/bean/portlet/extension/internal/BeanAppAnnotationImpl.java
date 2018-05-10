@@ -20,8 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.portlet.annotations.PortletApplication;
+import javax.portlet.annotations.RuntimeOption;
 
 import javax.xml.XMLConstants;
 
@@ -34,10 +36,21 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 
 		if (portletApplication == null) {
 			setDefaultNamespace(XMLConstants.NULL_NS_URI);
+			_containerRuntimeOptions = Collections.emptyMap();
 			_eventDefinitions = Collections.emptyList();
 			_publicRenderParamMap = Collections.emptyMap();
 		}
 		else {
+			_containerRuntimeOptions = Arrays.stream(
+					portletApplication.runtimeOptions())
+					.collect(
+							Collectors.toMap(
+								RuntimeOption::name,
+								runtimeOption -> {
+									return Arrays.asList(
+										runtimeOption.values());
+								}));
+
 			setDefaultNamespace(portletApplication.defaultNamespaceURI());
 			_eventDefinitions = new ArrayList<>();
 			Arrays.stream(portletApplication.events())
@@ -57,6 +70,11 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 	}
 
 	@Override
+	public Map<String, List<String>> getContainerRuntimeOptions() {
+		return _containerRuntimeOptions;
+	}
+
+	@Override
 	public List<EventDefinition> getEventDefinitions() {
 		return _eventDefinitions;
 	}
@@ -71,6 +89,7 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 		return _specVersion;
 	}
 
+	private Map<String, List<String>> _containerRuntimeOptions;
 	private List<EventDefinition> _eventDefinitions;
 	private Map<String, PublicRenderParam> _publicRenderParamMap;
 	private String _specVersion;
