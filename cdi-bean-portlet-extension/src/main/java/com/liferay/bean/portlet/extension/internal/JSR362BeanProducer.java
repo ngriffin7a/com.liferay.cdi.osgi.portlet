@@ -410,7 +410,8 @@ public class JSR362BeanProducer {
 		PortletRequest portletRequest = getPortletRequest();
 
 		if ((portletRequest == null) ||
-			!(portletRequest instanceof RenderRequest)) {
+			!(portletRequest instanceof RenderRequest) ||
+			(portletRequest instanceof HeaderRequest)) {
 			return null;
 		}
 
@@ -425,7 +426,8 @@ public class JSR362BeanProducer {
 		PortletResponse portletResponse = getPortletResponse();
 
 		if ((portletResponse == null) ||
-			!(portletResponse instanceof RenderResponse)) {
+			!(portletResponse instanceof RenderResponse) ||
+			(portletResponse instanceof HeaderResponse)) {
 			return null;
 		}
 
