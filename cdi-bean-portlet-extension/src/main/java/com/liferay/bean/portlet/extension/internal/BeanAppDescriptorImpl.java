@@ -36,13 +36,8 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 	}
 
 	@Override
-	public Set<String> getCustomPortletModes(boolean portalManaged) {
-
-		if (portalManaged) {
-			return _customPortletModesPortalManaged;
-		}
-
-		return _customPortletModesNonPortalManaged;
+	public Set<String> getCustomPortletModes() {
+		return _customPortletModes;
 	}
 
 	@Override
@@ -62,10 +57,7 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 
 	private Map<String, List<String>> _containerRuntimeOptions =
 		new HashMap<>();
-	private Set<String> _customPortletModesPortalManaged =
-		new LinkedHashSet<>();
-	private Set<String> _customPortletModesNonPortalManaged =
-		new LinkedHashSet<>();
+	private Set<String> _customPortletModes = new LinkedHashSet<>();
 	private List<EventDefinition> _eventDefinitions = new ArrayList<>();
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();

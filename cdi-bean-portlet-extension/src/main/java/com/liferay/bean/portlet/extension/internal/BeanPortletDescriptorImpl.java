@@ -273,7 +273,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 				_portletName);
 		}
 
-		Set<String> customPortletModes = beanApp.getCustomPortletModes(false);
+		Set<String> customPortletModes = beanApp.getCustomPortletModes();
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",

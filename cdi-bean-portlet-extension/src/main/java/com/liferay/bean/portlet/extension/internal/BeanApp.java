@@ -25,7 +25,7 @@ public interface BeanApp {
 
 	public Map<String, List<String>> getContainerRuntimeOptions();
 
-	public Set<String> getCustomPortletModes(boolean portalManaged);
+	public Set<String> getCustomPortletModes();
 
 	public String getDefaultNamespace();
 

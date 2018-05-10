@@ -52,16 +52,8 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 										runtimeOption.values());
 								}));
 
-			_customPortletModesPortalManaged = Arrays
-				.stream(portletApplication.customPortletModes())
-					.filter(
-							customPortletMode ->
-								(!customPortletMode.portalManaged()))
-					.map(customPortletMode -> customPortletMode.name())
-					.collect(Collectors.toSet());
-
-			_customPortletModesNonPortalManaged = Arrays
-				.stream(portletApplication.customPortletModes())
+			_customPortletModes = Arrays.stream(
+					portletApplication.customPortletModes())
 					.filter(
 							customPortletMode ->
 								(!customPortletMode.portalManaged()))
@@ -92,13 +84,8 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 	}
 
 	@Override
-	public Set<String> getCustomPortletModes(boolean portalManaged) {
-
-		if (portalManaged) {
-			return _customPortletModesPortalManaged;
-		}
-
-		return _customPortletModesNonPortalManaged;
+	public Set<String> getCustomPortletModes() {
+		return _customPortletModes;
 	}
 
 	@Override
@@ -117,8 +104,7 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 	}
 
 	private Map<String, List<String>> _containerRuntimeOptions;
-	private Set<String> _customPortletModesPortalManaged;
-	private Set<String> _customPortletModesNonPortalManaged;
+	private Set<String> _customPortletModes;
 	private List<EventDefinition> _eventDefinitions;
 	private Map<String, PublicRenderParam> _publicRenderParamMap;
 	private String _specVersion;

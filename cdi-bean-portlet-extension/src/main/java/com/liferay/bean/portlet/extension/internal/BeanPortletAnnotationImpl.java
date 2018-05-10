@@ -160,7 +160,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			"javax.portlet.info.title",
 			getEnglishText(_portletConfiguration.title()), getPortletName());
 
-		Set<String> customPortletModes = beanApp.getCustomPortletModes(false);
+		Set<String> customPortletModes = beanApp.getCustomPortletModes();
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",

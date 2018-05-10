@@ -187,11 +187,14 @@ public class PortletDescriptorParser {
 					}
 					else if ("custom-portlet-mode".equals(elementName)) {
 
-						Set<String> customPortletModes =
-							beanApp.getCustomPortletModes(
-								customPortletModePortalManaged);
+						if (!customPortletModePortalManaged) {
 
-						customPortletModes.add(customPortletMode);
+							Set<String> customPortletModes =
+								beanApp.getCustomPortletModes();
+
+							customPortletModes.add(customPortletMode);
+						}
+
 						customPortletMode = null;
 						customPortletModePortalManaged = true;
 					}

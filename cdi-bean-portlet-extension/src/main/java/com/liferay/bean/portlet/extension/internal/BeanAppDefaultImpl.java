@@ -32,7 +32,7 @@ public class BeanAppDefaultImpl extends BeanAppBase {
 	}
 
 	@Override
-	public Set<String> getCustomPortletModes(boolean portalManaged) {
+	public Set<String> getCustomPortletModes() {
 		return Collections.emptySet();
 	}
 
