@@ -22,9 +22,9 @@ import java.util.Map;
 /**
  * @author Neil Griffin
  */
-public class BeanAppDecriptorImpl extends BeanAppBase {
+public class BeanAppDescriptorImpl extends BeanAppBase {
 
-	public BeanAppDecriptorImpl(String specVersion) {
+	public BeanAppDescriptorImpl(String specVersion) {
 		_specVersion = specVersion;
 	}
 
