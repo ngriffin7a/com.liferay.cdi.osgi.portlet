@@ -16,7 +16,9 @@ package com.liferay.bean.portlet.extension.internal;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -223,17 +225,23 @@ public class ScopedBeanHolder {
 			}
 		}
 
-		Collections.list(_portletRequest.getAttributeNames())
-			.stream()
-			.filter(
-					attributeName ->
-						attributeName.startsWith(
-							BeanContextBase.ATTRIBUTE_NAME_PREFIX))
-			.map(attributeName ->
-						_portletRequest.getAttribute(attributeName))
+		List<String> beanRequestAttributeNames = Collections.list(
+				_portletRequest.getAttributeNames())
+				.stream()
+				.filter(
+						name ->
+							name.startsWith(
+								BeanContextBase.ATTRIBUTE_NAME_PREFIX))
+				.collect(Collectors.toList());
+
+		beanRequestAttributeNames.stream()
+			.map(name -> _portletRequest.getAttribute(name))
 			.filter(Objects::nonNull)
-			.filter(attributeValue -> attributeValue instanceof ScopedBean)
-			.forEach(attributeValue -> ((ScopedBean) attributeValue).destroy());
+			.filter(value -> value instanceof ScopedBean)
+			.forEach(value -> ((ScopedBean) value).destroy());
+
+		beanRequestAttributeNames.stream()
+			.forEach(name -> _portletRequest.removeAttribute(name));
 	}
 
 	protected String getParameterName(PortletSerializable portletSerializable) {
