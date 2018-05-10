@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.portlet.annotations.PortletApplication;
@@ -51,6 +52,22 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 										runtimeOption.values());
 								}));
 
+			_customPortletModesPortalManaged = Arrays
+				.stream(portletApplication.customPortletModes())
+					.filter(
+							customPortletMode ->
+								(!customPortletMode.portalManaged()))
+					.map(customPortletMode -> customPortletMode.name())
+					.collect(Collectors.toSet());
+
+			_customPortletModesNonPortalManaged = Arrays
+				.stream(portletApplication.customPortletModes())
+					.filter(
+							customPortletMode ->
+								(!customPortletMode.portalManaged()))
+					.map(customPortletMode -> customPortletMode.name())
+					.collect(Collectors.toSet());
+
 			setDefaultNamespace(portletApplication.defaultNamespaceURI());
 			_eventDefinitions = new ArrayList<>();
 			Arrays.stream(portletApplication.events())
@@ -75,6 +92,16 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 	}
 
 	@Override
+	public Set<String> getCustomPortletModes(boolean portalManaged) {
+
+		if (portalManaged) {
+			return _customPortletModesPortalManaged;
+		}
+
+		return _customPortletModesNonPortalManaged;
+	}
+
+	@Override
 	public List<EventDefinition> getEventDefinitions() {
 		return _eventDefinitions;
 	}
@@ -90,6 +117,8 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 	}
 
 	private Map<String, List<String>> _containerRuntimeOptions;
+	private Set<String> _customPortletModesPortalManaged;
+	private Set<String> _customPortletModesNonPortalManaged;
 	private List<EventDefinition> _eventDefinitions;
 	private Map<String, PublicRenderParam> _publicRenderParamMap;
 	private String _specVersion;

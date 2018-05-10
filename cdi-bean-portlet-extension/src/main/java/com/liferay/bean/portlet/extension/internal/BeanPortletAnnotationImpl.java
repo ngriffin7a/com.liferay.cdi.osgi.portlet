@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.portlet.annotations.LocaleString;
@@ -159,6 +160,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			"javax.portlet.info.title",
 			getEnglishText(_portletConfiguration.title()), getPortletName());
 
+		Set<String> customPortletModes = beanApp.getCustomPortletModes(false);
+
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",
 			Arrays.stream(_portletConfiguration.supports())
@@ -168,6 +171,10 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 							PortletDictionaryUtil.prependDelimiter(
 								";",
 								Arrays.stream(supports.portletModes())
+									.filter(
+											portletMode ->
+												customPortletModes.contains(
+													portletMode))
 									.collect(Collectors.joining(","))))
 				.collect(Collectors.toList()));
 

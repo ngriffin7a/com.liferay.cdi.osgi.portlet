@@ -22,6 +22,7 @@ import java.net.URL;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.annotations.PortletApplication;
 
@@ -59,11 +60,10 @@ public class PortletDescriptorParser {
 		BeanFilterDescriptorImpl beanFilter = null;
 		BeanPortletDescriptorImpl beanPortlet = null;
 
-		//J-
-		// String customPortletMode = null;
-		// boolean customPortletModePortalManaged = false;
+		String customPortletMode = null;
+		boolean customPortletModePortalManaged = true;
+
 		// String customWindowState = null;
-		//J+
 		DescriptorContainerRuntimeOption descriptorContainerRuntimeOption =
 			null;
 		DescriptorFilterMapping descriptorFilterMapping = null;
@@ -185,19 +185,19 @@ public class PortletDescriptorParser {
 
 						descriptorContainerRuntimeOption = null;
 					}
+					else if ("custom-portlet-mode".equals(elementName)) {
+
+						Set<String> customPortletModes =
+							beanApp.getCustomPortletModes(
+								customPortletModePortalManaged);
+
+						customPortletModes.add(customPortletMode);
+						customPortletMode = null;
+						customPortletModePortalManaged = true;
+					}
 
 					//J-
 					/*
-					else if ("custom-portlet-mode".equals(elementName)) {
-
-						if (!customPortletModePortalManaged &&
-							(customPortletMode != null)) {
-							// beanPortlet.addCustomPortletMode(customPortletMode);
-						}
-
-						customPortletMode = null;
-						customPortletModePortalManaged = false;
-					}
 					else if ("custom-window-state".equals(elementName)) {
 
 						if (customWindowState != null) {
@@ -358,15 +358,10 @@ public class PortletDescriptorParser {
 								Integer.parseInt(elementText));
 						}
 					}
-
-					//J-
-					/*
 					else if ("portal-managed".equals(elementName)) {
 						customPortletModePortalManaged = GetterUtil.getBoolean(
 							elementText);
 					}
-					*/
-					//J+
 					else if ("portlet".equals(elementName)) {
 						beanPortlets.add(beanPortlet);
 						beanPortlet = null;

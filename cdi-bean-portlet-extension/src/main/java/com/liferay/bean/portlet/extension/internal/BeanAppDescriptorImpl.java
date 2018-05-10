@@ -16,8 +16,10 @@ package com.liferay.bean.portlet.extension.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Neil Griffin
@@ -31,6 +33,16 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 	@Override
 	public Map<String, List<String>> getContainerRuntimeOptions() {
 		return _containerRuntimeOptions;
+	}
+
+	@Override
+	public Set<String> getCustomPortletModes(boolean portalManaged) {
+
+		if (portalManaged) {
+			return _customPortletModesPortalManaged;
+		}
+
+		return _customPortletModesNonPortalManaged;
 	}
 
 	@Override
@@ -50,6 +62,10 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 
 	private Map<String, List<String>> _containerRuntimeOptions =
 		new HashMap<>();
+	private Set<String> _customPortletModesPortalManaged =
+		new LinkedHashSet<>();
+	private Set<String> _customPortletModesNonPortalManaged =
+		new LinkedHashSet<>();
 	private List<EventDefinition> _eventDefinitions = new ArrayList<>();
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();

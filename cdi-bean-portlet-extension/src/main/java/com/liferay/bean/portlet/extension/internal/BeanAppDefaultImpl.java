@@ -17,6 +17,7 @@ package com.liferay.bean.portlet.extension.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.annotations.PortletApplication;
 
@@ -28,6 +29,11 @@ public class BeanAppDefaultImpl extends BeanAppBase {
 	@Override
 	public Map<String, List<String>> getContainerRuntimeOptions() {
 		return Collections.emptyMap();
+	}
+
+	@Override
+	public Set<String> getCustomPortletModes(boolean portalManaged) {
+		return Collections.emptySet();
 	}
 
 	@Override

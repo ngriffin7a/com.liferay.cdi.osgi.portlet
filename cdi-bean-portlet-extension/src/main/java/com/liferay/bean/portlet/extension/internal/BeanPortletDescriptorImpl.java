@@ -273,6 +273,8 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 				_portletName);
 		}
 
+		Set<String> customPortletModes = beanApp.getCustomPortletModes(false);
+
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",
 			_descriptorSupports.stream()
@@ -281,6 +283,10 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 							supports.getMimeType() + ";" +
 							supports.getPortletModes()
 								.stream()
+								.filter(
+										portletMode ->
+											customPortletModes.contains(
+												portletMode))
 								.collect(Collectors.joining(",")))
 				.collect(Collectors.toList()));
 

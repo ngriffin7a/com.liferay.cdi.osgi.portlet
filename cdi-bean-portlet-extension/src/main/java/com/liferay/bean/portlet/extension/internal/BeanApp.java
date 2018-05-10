@@ -16,6 +16,7 @@ package com.liferay.bean.portlet.extension.internal;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Neil Griffin
@@ -23,6 +24,8 @@ import java.util.Map;
 public interface BeanApp {
 
 	public Map<String, List<String>> getContainerRuntimeOptions();
+
+	public Set<String> getCustomPortletModes(boolean portalManaged);
 
 	public String getDefaultNamespace();
 
