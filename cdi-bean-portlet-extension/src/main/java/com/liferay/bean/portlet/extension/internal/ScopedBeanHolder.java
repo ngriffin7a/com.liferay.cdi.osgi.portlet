@@ -240,7 +240,7 @@ public class ScopedBeanHolder {
 			.filter(value -> value instanceof ScopedBean)
 			.forEach(value -> ((ScopedBean) value).destroy());
 
-		beanRequestAttributeNames.stream()
+		beanRequestAttributeNames
 			.forEach(name -> _portletRequest.removeAttribute(name));
 	}
 

@@ -30,6 +30,7 @@ import javax.portlet.annotations.LocaleString;
 import javax.portlet.annotations.PortletApplication;
 import javax.portlet.annotations.PortletConfiguration;
 import javax.portlet.annotations.Preference;
+import javax.portlet.annotations.SecurityRoleRef;
 
 /**
  * @author Neil Griffin
@@ -59,8 +60,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			_liferayPortletConfigurationProperties = new HashMap<>();
 			_liferayPortletConfigurationProperties.putAll(
 				Arrays.stream(properties)
-					.map(property ->
-								PropertyMapEntryFactory.create(property))
+					.map(PropertyMapEntryFactory::create)
 					.collect(
 						Collectors.toMap(
 							Map.Entry::getKey, Map.Entry::getValue)));
@@ -116,16 +116,15 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			containerRuntimeOptions.entrySet()
 				.stream()
 				.map(
-						entry -> {
-							return entry.getValue()
+						entry ->
+							entry.getValue()
 								.stream()
 								.map(
 										value ->
 											PortletDictionaryUtil
 												.formatNameValuePair(
 													entry.getKey(), value))
-								.collect(Collectors.toList());
-						})
+								.collect(Collectors.toList()))
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList()));
 
@@ -170,10 +169,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 							PortletDictionaryUtil.formatNameValuePair(
 								supports.mimeType(),
 								Arrays.stream(supports.portletModes())
-									.filter(
-											portletMode ->
-												customPortletModes.contains(
-													portletMode))
+									.filter(customPortletModes::contains)
 									.collect(Collectors.joining(","))))
 				.collect(Collectors.toList()));
 
@@ -214,7 +210,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.security-role-ref",
 			Arrays.stream(_portletConfiguration.roleRefs())
-				.map(roleRef -> roleRef.roleName())
+				.map(SecurityRoleRef::roleName)
 				.collect(Collectors.joining(",")));
 
 		portletDictionary.put(
@@ -251,24 +247,18 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 	}
 
 	protected String getEnglishText(LocaleString[] localeStrings) {
-		return getEnglishText(localeStrings, null);
-	}
-
-	protected String getEnglishText(
-			LocaleString[] localeStrings, String defaultValue) {
 
 		String english = Locale.ENGLISH.getLanguage();
 
 		for (LocaleString localeString : localeStrings) {
 
-			if ((localeString.locale() == null) ||
-				english.equals(localeString.locale())) {
+			if (english.equals(localeString.locale())) {
 
 				return localeString.value();
 			}
 		}
 
-		return defaultValue;
+		return null;
 	}
 
 	private Map<String, String> _liferayPortletConfigurationProperties;

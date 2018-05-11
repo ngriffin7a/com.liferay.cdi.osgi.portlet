@@ -501,9 +501,6 @@ public class PortletDescriptorParser {
 							descriptorPreference.addValue(elementText);
 						}
 					}
-					else if ("value-type".equals(elementName)) {
-						eventDefinition.setValueType(elementText);
-					}
 					else if ("version".equals(elementName)) {
 						descriptorResourceDependency.setVersion(elementText);
 					}
@@ -525,9 +522,7 @@ public class PortletDescriptorParser {
 		}
 		catch (IOException | XMLStreamException e) {
 
-			if (xmlStreamReader != null) {
-				xmlStreamReader.close();
-			}
+			xmlStreamReader.close();
 
 			if (inputStream != null) {
 				inputStream.close();

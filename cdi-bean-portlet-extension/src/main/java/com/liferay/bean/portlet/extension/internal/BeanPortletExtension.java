@@ -17,6 +17,8 @@ package com.liferay.bean.portlet.extension.internal;
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import com.liferay.bean.portlet.extension.LiferayPortletConfigurations;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.Validator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -86,7 +88,6 @@ import javax.portlet.filter.PortletFilter;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -198,13 +199,6 @@ public class BeanPortletExtension implements Extension {
 
 					liferayDescriptor.getPortletNames()
 						.stream()
-						.peek(
-								portletName -> {
-
-									if (!_beanPortlets.containsKey(
-											portletName)) {
-									}
-								})
 						.map(portletName -> _beanPortlets.get(portletName))
 						.filter(Objects::nonNull)
 						.forEach(
@@ -287,15 +281,16 @@ public class BeanPortletExtension implements Extension {
 
 		_portletRegistrations = _beanPortlets.entrySet()
 			.stream()
-			.map(
-				entry ->
-					RegistrationUtil.registerBeanPortlet(
-						bundleContext, entry.getValue(),
-						servletContext))
-			.collect(Collectors.toList());
+				.map(
+						entry ->
+							RegistrationUtil.registerBeanPortlet(
+								bundleContext, entry.getValue(),
+								servletContext))
+				.collect(Collectors.toList());
 
-		_resourceBundleLoaderRegistrations = _beanPortlets.entrySet()
-			.stream()
+		_resourceBundleLoaderRegistrations = _beanPortlets
+			.entrySet()
+				.stream()
 				.map(
 						entry ->
 							RegistrationUtil.registerResourceBundleLoader(
@@ -303,18 +298,16 @@ public class BeanPortletExtension implements Extension {
 								servletContext))
 				.collect(Collectors.toList());
 
-		_beanFilters.stream()
-			.forEach(
-				beanFilter ->
-					beanFilter.getPortletNames()
-						.stream()
-						.forEach(
-							portletName ->
-								_filterRegistrations.addAll(
-									RegistrationUtil.registerBeanFilter(
-										bundleContext, portletName,
-										_beanPortlets.keySet(), beanFilter,
-										beanManager, servletContext))));
+		_beanFilters.forEach(
+			beanFilter ->
+				beanFilter.getPortletNames()
+					.forEach(
+						portletName ->
+							_filterRegistrations.addAll(
+								RegistrationUtil.registerBeanFilter(
+									bundleContext, portletName,
+									_beanPortlets.keySet(), beanFilter,
+									beanManager, servletContext))));
 
 		_log.info(
 			"Discovered {} bean portlets and {} bean filters for {}",
@@ -364,7 +357,7 @@ public class BeanPortletExtension implements Extension {
 		Set<Class<? extends Annotation>> annotationClasses =
 			annotatedType.getAnnotations()
 				.stream()
-				.map(annotation -> annotation.annotationType())
+				.map(Annotation::annotationType)
 				.collect(Collectors.toSet());
 
 		if (annotationClasses.contains(RequestScoped.class)) {
@@ -492,8 +485,7 @@ public class BeanPortletExtension implements Extension {
 
 		String configuredPortletName = portletConfiguration.portletName();
 
-		if ((configuredPortletName != null) &&
-			(configuredPortletName.length() > 0)) {
+		if (Validator.isNotNull(configuredPortletName)) {
 
 			if (_portletApplicationClass == null) {
 				_beanPortlets.putIfAbsent(
@@ -568,7 +560,7 @@ public class BeanPortletExtension implements Extension {
 
 				_beanPortlets.entrySet()
 					.stream()
-					.map(entry -> entry.getValue())
+					.map(Map.Entry::getValue)
 					.filter(
 							beanPortlet ->
 								beanClassName.equals(
@@ -580,7 +572,6 @@ public class BeanPortletExtension implements Extension {
 				(portletNames.length > 0) && ("*".equals(portletNames[0]))) {
 
 				_beanPortlets.keySet()
-					.stream()
 					.forEach(
 						portletName ->
 							_beanPortlets.get(portletName)
@@ -756,7 +747,7 @@ public class BeanPortletExtension implements Extension {
 
 		Collections.list(httpSession.getAttributeNames())
 			.stream()
-			.map(attributeName -> httpSession.getAttribute(attributeName))
+			.map(httpSession::getAttribute)
 			.filter(Objects::nonNull)
 			.filter(attributeValue ->
 						(attributeValue instanceof ScopedBean))
@@ -785,7 +776,7 @@ public class BeanPortletExtension implements Extension {
 	private List<Class<?>> _portletConfigurationsClasses = new ArrayList<>();
 	private List<Class<?>> _portletLifecycleFilterClasses = new ArrayList<>();
 	private List<ScannedMethod> _renderMethods = new ArrayList<>();
-	private List<ServiceRegistration<ResourceBundleLoader>>
-		_resourceBundleLoaderRegistrations = new ArrayList<>();
+	private List<ServiceRegistration<ResourceBundleLoader>> _resourceBundleLoaderRegistrations =
+		new ArrayList<>();
 	private List<ScannedMethod> _serveResourceMethods = new ArrayList<>();
 }

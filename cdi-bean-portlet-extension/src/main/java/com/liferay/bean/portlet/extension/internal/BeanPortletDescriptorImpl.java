@@ -230,16 +230,15 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			containerRuntimeOptions.entrySet()
 				.stream()
 				.map(
-						entry -> {
-							return entry.getValue()
+						entry ->
+							entry.getValue()
 								.stream()
 								.map(
 										value ->
 											PortletDictionaryUtil
 												.formatNameValuePair(
 													entry.getKey(), value))
-								.collect(Collectors.toList());
-						})
+								.collect(Collectors.toList()))
 				.flatMap(Collection::stream)
 				.collect(Collectors.toList()));
 
@@ -283,10 +282,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 							supports.getMimeType() + ";" +
 							supports.getPortletModes()
 								.stream()
-								.filter(
-										portletMode ->
-											customPortletModes.contains(
-												portletMode))
+								.filter(customPortletModes::contains)
 								.collect(Collectors.joining(",")))
 				.collect(Collectors.toList()));
 
@@ -326,7 +322,7 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.security-role-ref",
 			_descriptorSecurityRoleRefs.stream()
-				.map(roleRef -> roleRef.getRoleName())
+				.map(DescriptorSecurityRoleRef::getRoleName)
 				.collect(Collectors.joining(",")));
 
 		portletDictionary.put(

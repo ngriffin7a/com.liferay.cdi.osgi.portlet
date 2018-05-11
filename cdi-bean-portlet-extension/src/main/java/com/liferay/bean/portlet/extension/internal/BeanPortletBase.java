@@ -172,7 +172,7 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.dependency",
 			getPortletDependencies().stream()
-				.map(portletDependency -> portletDependency.toString())
+				.map(Object::toString)
 				.collect(Collectors.toList()));
 
 		portletDictionary.putIfNotNull("javax.portlet.name", portletId);

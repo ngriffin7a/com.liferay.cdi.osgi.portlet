@@ -21,11 +21,9 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -36,7 +34,6 @@ import javax.portlet.filter.PortletFilter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 

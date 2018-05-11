@@ -27,11 +27,7 @@ public interface EventDefinition {
 
 	public QName getQName();
 
-	public String getValueType();
-
 	public void setName(String name);
 
 	public void setQName(QName qName);
-
-	public void setValueType(String valueType);
 }

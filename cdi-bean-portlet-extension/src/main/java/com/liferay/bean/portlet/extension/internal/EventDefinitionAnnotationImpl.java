@@ -37,8 +37,6 @@ public class EventDefinitionAnnotationImpl extends EventDefinitionBase {
 							portletQName.namespaceURI(),
 							portletQName.localPart()))
 				.collect(Collectors.toList());
-		setValueType(eventDefinition.payloadType()
-			.getName());
 	}
 
 	public EventDefinitionAnnotationImpl(PortletQName portletQName) {

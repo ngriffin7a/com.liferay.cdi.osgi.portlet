@@ -14,6 +14,7 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.portlet.annotations.CustomPortletMode;
 import javax.portlet.annotations.PortletApplication;
 import javax.portlet.annotations.RuntimeOption;
 
@@ -47,35 +49,37 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 					.collect(
 							Collectors.toMap(
 								RuntimeOption::name,
-								runtimeOption -> {
-									return Arrays.asList(
-										runtimeOption.values());
-								}));
+								runtimeOption ->
+									Arrays.asList(runtimeOption.values())));
 
 			_customPortletModes = Arrays.stream(
 					portletApplication.customPortletModes())
 					.filter(
 							customPortletMode ->
 								(!customPortletMode.portalManaged()))
-					.map(customPortletMode -> customPortletMode.name())
+					.map(CustomPortletMode::name)
 					.collect(Collectors.toSet());
 
 			setDefaultNamespace(portletApplication.defaultNamespaceURI());
+
 			_eventDefinitions = new ArrayList<>();
+
 			Arrays.stream(portletApplication.events())
-				.map(
-						eventDefinition ->
-							EventDefinitionFactory.create(eventDefinition))
+				.map(EventDefinitionFactory::create)
 				.forEach(
 					eventDefinition -> _eventDefinitions.add(eventDefinition));
+
 			_publicRenderParamMap = new HashMap<>();
+
 			Arrays.stream(portletApplication.publicParams())
-				.map(prp -> PublicRenderParamFactory.create(prp))
+				.map(PublicRenderParamFactory::create)
 				.forEach(
 					prp -> _publicRenderParamMap.put(prp.getIdentifier(), prp));
 		}
 
-		_specVersion = portletApplication.version();
+		if (Validator.isNotNull(portletApplication.version())) {
+			_specVersion = portletApplication.version();
+		}
 	}
 
 	@Override

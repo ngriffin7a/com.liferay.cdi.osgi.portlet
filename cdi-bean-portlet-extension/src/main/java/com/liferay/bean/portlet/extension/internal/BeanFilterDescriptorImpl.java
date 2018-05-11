@@ -69,7 +69,7 @@ public class BeanFilterDescriptorImpl implements BeanFilter {
 
 		if (_ordinal != null) {
 			portletDictionary.put(
-				"service.ranking:Integer", _ordinal.intValue());
+				"service.ranking:Integer", _ordinal);
 		}
 
 		_descriptorInitParams.forEach(

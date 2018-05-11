@@ -21,7 +21,7 @@ import javax.portlet.annotations.PortletLifecycleFilter;
  */
 public class BeanFilterFactory {
 
-	public static final BeanFilter create(
+	public static BeanFilter create(
 			Class<?> filterClass,
 			PortletLifecycleFilter portletLifecycleFilter) {
 		return new BeanFilterAnnotationImpl(

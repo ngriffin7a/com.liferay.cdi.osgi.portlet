@@ -27,20 +27,9 @@ public abstract class EventDefinitionBase implements EventDefinition {
 	}
 
 	@Override
-	public String getValueType() {
-		return _valueType;
-	}
-
-	@Override
 	public void setQName(QName qName) {
 		_qName = qName;
 	}
 
-	@Override
-	public void setValueType(String valueType) {
-		_valueType = valueType;
-	}
-
 	private QName _qName;
-	private String _valueType;
 }

@@ -14,7 +14,6 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import javax.portlet.annotations.ActionMethod;
