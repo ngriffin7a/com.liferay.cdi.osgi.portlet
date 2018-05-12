@@ -196,8 +196,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 					Arrays.stream(actionMethod.publishingEvents())
 						.map(
 								portletQName ->
-									portletQName.localPart() + ";" +
-									portletQName.namespaceURI())
+									PortletDictionaryUtil.formatNameValuePair(
+										portletQName.localPart(),
+										portletQName.namespaceURI()))
 						.collect(Collectors.toList()));
 			}
 
@@ -225,8 +226,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 					Arrays.stream(eventMethod.publishingEvents())
 						.map(
 								portletQName ->
-									portletQName.localPart() + ";" +
-									portletQName.namespaceURI())
+									PortletDictionaryUtil.formatNameValuePair(
+										portletQName.localPart(),
+										portletQName.namespaceURI()))
 						.collect(Collectors.toList()));
 			}
 
@@ -247,8 +249,9 @@ public abstract class BeanPortletBase implements BeanPortlet {
 					Arrays.stream(eventMethod.processingEvents())
 						.map(
 								portletQName ->
-									portletQName.localPart() + ";" +
-									portletQName.namespaceURI())
+									PortletDictionaryUtil.formatNameValuePair(
+										portletQName.localPart(),
+										portletQName.namespaceURI()))
 						.collect(Collectors.toList()));
 			}
 

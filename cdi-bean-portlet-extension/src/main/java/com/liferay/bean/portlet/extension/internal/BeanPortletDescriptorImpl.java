@@ -362,10 +362,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			_supportedProcessingEvents.stream()
 				.map(
 						supportedEvent ->
-							supportedEvent.getQName()
-								.getLocalPart() + ";" +
-							supportedEvent.getQName()
-								.getNamespaceURI())
+							PortletDictionaryUtil.formatNameValuePair(
+								supportedEvent.getQName()
+									.getLocalPart(),
+								supportedEvent.getQName()
+									.getNamespaceURI()))
 				.collect(Collectors.toList()));
 
 		portletDictionary.put(
@@ -384,10 +385,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 			_supportedPublishingEvents.stream()
 				.map(
 						supportedEvent ->
-							supportedEvent.getQName()
-								.getLocalPart() + ";" +
-							supportedEvent.getQName()
-								.getNamespaceURI())
+							PortletDictionaryUtil.formatNameValuePair(
+								supportedEvent.getQName()
+									.getLocalPart(),
+								supportedEvent.getQName()
+									.getNamespaceURI()))
 				.collect(Collectors.toList()));
 
 		portletDictionary.put(
