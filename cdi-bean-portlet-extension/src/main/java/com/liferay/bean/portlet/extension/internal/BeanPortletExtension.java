@@ -649,28 +649,45 @@ public class BeanPortletExtension implements Extension {
 		if (Portlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
-				_actionMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.ACTION,
-						beanPortletClass.getMethod(
-							"processAction", ActionRequest.class,
-							ActionResponse.class), portletName));
+				Method processActionMethod = beanPortletClass.getMethod(
+					"processAction", ActionRequest.class, ActionResponse.class);
 
-				_destroyMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.DESTROY,
-						beanPortletClass.getMethod("destroy"), portletName));
-				_initMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.INIT,
-						beanPortletClass.getMethod("init", PortletConfig.class),
-						portletName));
-				_renderMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.RENDER,
-						beanPortletClass.getMethod(
-							"render", RenderRequest.class,
-							RenderResponse.class), portletName));
+				if (!processActionMethod.isAnnotationPresent(
+						ActionMethod.class)) {
+					_actionMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.ACTION,
+							processActionMethod, portletName));
+				}
+
+				Method destroyMethod = beanPortletClass.getMethod("destroy");
+
+				if (!destroyMethod.isAnnotationPresent(DestroyMethod.class)) {
+					_destroyMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.DESTROY, destroyMethod,
+							portletName));
+				}
+
+				Method initMethod = beanPortletClass.getMethod(
+					"init", PortletConfig.class);
+
+				if (!initMethod.isAnnotationPresent(InitMethod.class)) {
+					_initMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.INIT, initMethod,
+							portletName));
+				}
+
+				Method renderMethod = beanPortletClass.getMethod(
+					"render", RenderRequest.class, RenderResponse.class);
+
+				if (!renderMethod.isAnnotationPresent(RenderMethod.class)) {
+					_renderMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.RENDER, renderMethod,
+							portletName));
+				}
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
@@ -680,12 +697,15 @@ public class BeanPortletExtension implements Extension {
 		if (EventPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
-				_eventMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.EVENT,
-						beanPortletClass.getMethod(
-							"processEvent", EventRequest.class,
-							EventResponse.class), portletName));
+				Method eventMethod = beanPortletClass.getMethod(
+					"processEvent", EventRequest.class, EventResponse.class);
+
+				if (!eventMethod.isAnnotationPresent(EventMethod.class)) {
+					_eventMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.EVENT, eventMethod,
+							portletName));
+				}
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
@@ -695,12 +715,16 @@ public class BeanPortletExtension implements Extension {
 		if (HeaderPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
-				_headerMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.HEADER,
-						beanPortletClass.getMethod(
-							"renderHeaders", HeaderRequest.class,
-							HeaderResponse.class), portletName));
+				Method renderHeadersMethod = beanPortletClass.getMethod(
+					"renderHeaders", HeaderRequest.class, HeaderResponse.class);
+
+				if (!renderHeadersMethod.isAnnotationPresent(
+						HeaderMethod.class)) {
+					_headerMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.HEADER,
+							renderHeadersMethod, portletName));
+				}
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
@@ -710,12 +734,17 @@ public class BeanPortletExtension implements Extension {
 		if (ResourceServingPortlet.class.isAssignableFrom(beanPortletClass)) {
 
 			try {
-				_serveResourceMethods.add(
-					new ScannedMethod(
-						beanPortletClass, MethodType.SERVE_RESOURCE,
-						beanPortletClass.getMethod(
-							"serveResource", ResourceRequest.class,
-							ResourceResponse.class), portletName));
+				Method serveResourceMethod = beanPortletClass.getMethod(
+					"serveResource", ResourceRequest.class,
+					ResourceResponse.class);
+
+				if (!serveResourceMethod.isAnnotationPresent(
+						ServeResourceMethod.class)) {
+					_serveResourceMethods.add(
+						new ScannedMethod(
+							beanPortletClass, MethodType.SERVE_RESOURCE,
+							serveResourceMethod, portletName));
+				}
 			}
 			catch (NoSuchMethodException e) {
 				_log.error(e.getMessage(), e);
