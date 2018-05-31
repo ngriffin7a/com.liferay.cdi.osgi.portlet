@@ -46,25 +46,25 @@ public class PortletDependencyImpl implements PortletDependency {
 	@Override
 	public String toString() {
 
-		StringBundler stringBundler = new StringBundler();
+		StringBundler sb = new StringBundler();
 
-		if (getName() != null) {
-			stringBundler.append(getName());
+		if (_name != null) {
+			sb.append(_name);
 		}
 
-		stringBundler.append(CharPool.SEMICOLON);
+		sb.append(CharPool.SEMICOLON);
 
-		if (getScope() != null) {
-			stringBundler.append(getScope());
+		if (_scope != null) {
+			sb.append(_scope);
 		}
 
-		stringBundler.append(CharPool.SEMICOLON);
+		sb.append(CharPool.SEMICOLON);
 
-		if (getVersion() != null) {
-			stringBundler.append(getVersion());
+		if (_version != null) {
+			sb.append(_version);
 		}
 
-		return stringBundler.toString();
+		return sb.toString();
 	}
 
 	private final String _name;

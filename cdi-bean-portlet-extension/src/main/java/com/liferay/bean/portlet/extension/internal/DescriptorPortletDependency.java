@@ -14,6 +14,9 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
+
 /**
  * @author Neil Griffin
  */
@@ -44,6 +47,30 @@ public class DescriptorPortletDependency implements PortletDependency {
 
 	public void setVersion(String version) {
 		_version = version;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBundler sb = new StringBundler();
+
+		if (_name != null) {
+			sb.append(_name);
+		}
+
+		sb.append(CharPool.SEMICOLON);
+
+		if (_scope != null) {
+			sb.append(_scope);
+		}
+
+		sb.append(CharPool.SEMICOLON);
+
+		if (_version != null) {
+			sb.append(_version);
+		}
+
+		return sb.toString();
 	}
 
 	private String _name;
