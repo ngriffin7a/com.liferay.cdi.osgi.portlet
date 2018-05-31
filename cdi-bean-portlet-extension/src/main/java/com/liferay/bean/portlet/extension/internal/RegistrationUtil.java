@@ -81,11 +81,11 @@ public class RegistrationUtil {
 					beanFilter.toDictionary(portletName)));
 		}
 
-		Set<String> beanFilterNames = (Set<String>) servletContext.getAttribute(
+		List<String> beanFilterNames = (List<String>) servletContext.getAttribute(
 			"com.liferay.beanFilterNames");
 
 		if (beanFilterNames == null) {
-			beanFilterNames = new HashSet<>();
+			beanFilterNames = new ArrayList<>();
 		}
 
 		beanFilterNames.add(beanFilter.getFilterName());
@@ -132,11 +132,11 @@ public class RegistrationUtil {
 
 				servletRegistration.addMapping("/portlet-servlet/*");
 
-				Set<String> beanPortletIds = (Set<String>)
+				List<String> beanPortletIds = (List<String>)
 					servletContext.getAttribute("com.liferay.beanPortletIds");
 
 				if (beanPortletIds == null) {
-					beanPortletIds = new HashSet<>();
+					beanPortletIds = new ArrayList<>();
 				}
 
 				beanPortletIds.add(portletId);
