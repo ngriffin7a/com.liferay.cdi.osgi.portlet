@@ -80,6 +80,8 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 		if (Validator.isNotNull(portletApplication.version())) {
 			_specVersion = portletApplication.version();
 		}
+
+		_urlGenerationListeners = new ArrayList<>();
 	}
 
 	@Override

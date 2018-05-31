@@ -67,5 +67,6 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();
 	private String _specVersion;
-	private List<URLGenerationListener> _urlGenerationListeners = new;
+	private List<URLGenerationListener> _urlGenerationListeners =
+		new ArrayList<>();
 }
