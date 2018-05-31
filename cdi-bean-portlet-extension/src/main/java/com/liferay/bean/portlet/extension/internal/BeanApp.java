@@ -35,5 +35,7 @@ public interface BeanApp {
 
 	public String getSpecVersion();
 
+	public List<URLGenerationListener> getURLGenerationListeners();
+
 	public void setDefaultNamespace(String defaultNamespace);
 }

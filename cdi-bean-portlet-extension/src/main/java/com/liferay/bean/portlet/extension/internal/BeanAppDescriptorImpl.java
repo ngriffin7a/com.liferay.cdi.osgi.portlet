@@ -55,6 +55,11 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 		return _specVersion;
 	}
 
+	@Override
+	public List<URLGenerationListener> getURLGenerationListeners() {
+		return _urlGenerationListeners;
+	}
+
 	private Map<String, List<String>> _containerRuntimeOptions =
 		new HashMap<>();
 	private Set<String> _customPortletModes = new LinkedHashSet<>();
@@ -62,4 +67,5 @@ public class BeanAppDescriptorImpl extends BeanAppBase {
 	private Map<String, PublicRenderParam> _publicRenderParamMap =
 		new HashMap<>();
 	private String _specVersion;
+	private List<URLGenerationListener> _urlGenerationListeners = new;
 }

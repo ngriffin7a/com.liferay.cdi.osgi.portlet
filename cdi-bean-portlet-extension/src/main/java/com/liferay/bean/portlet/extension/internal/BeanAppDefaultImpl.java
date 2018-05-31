@@ -55,4 +55,9 @@ public class BeanAppDefaultImpl extends BeanAppBase {
 
 		return defaultPortletApplication.version();
 	}
+
+	@Override
+	public List<URLGenerationListener> getURLGenerationListeners() {
+		return Collections.emptyList();
+	}
 }

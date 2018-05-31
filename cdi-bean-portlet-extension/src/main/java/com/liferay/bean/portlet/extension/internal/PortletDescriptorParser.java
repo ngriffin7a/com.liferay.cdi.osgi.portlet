@@ -71,9 +71,10 @@ public class PortletDescriptorParser {
 		DescriptorPreference descriptorPreference = null;
 		DescriptorSupportedEvent descriptorProcessingEvent = null;
 		DescriptorSupportedEvent descriptorPublishingEvent = null;
-		DescriptorPortletDependency descriptorResourceDependency = null;
+		PortletDependency portletDependency = null;
 		DescriptorSecurityRoleRef descriptorSecurityRoleRef = null;
 		DescriptorSupports descriptorSupports = null;
+		URLGenerationListener urlGenerationListener = null;
 		String elementName;
 		String elementText = null;
 		EventDefinition eventDefinition = null;
@@ -100,8 +101,7 @@ public class PortletDescriptorParser {
 							new DescriptorContainerRuntimeOption();
 					}
 					else if ("dependency".equals(elementName)) {
-						descriptorResourceDependency =
-							new DescriptorPortletDependency();
+						portletDependency = new PortletDependency();
 					}
 					else if ("event-definition".equals(elementName)) {
 						eventDefinition = new EventDefinitionDescriptorImpl(
@@ -115,6 +115,9 @@ public class PortletDescriptorParser {
 					}
 					else if ("init-param".equals(elementName)) {
 						descriptorInitParam = new DescriptorInitParam();
+					}
+					else if ("listener".equals(elementName)) {
+						urlGenerationListener = new URLGenerationListener();
 					}
 					else if ("portlet".equals(elementName)) {
 						beanPortlet = new BeanPortletDescriptorImpl(beanApp);
@@ -215,9 +218,8 @@ public class PortletDescriptorParser {
 						beanApp.setDefaultNamespace(elementText);
 					}
 					else if ("dependency".equals(elementName)) {
-						beanPortlet.addPortletDependency(
-							descriptorResourceDependency);
-						descriptorResourceDependency = null;
+						beanPortlet.addPortletDependency(portletDependency);
+						portletDependency = null;
 					}
 					else if ("description".equals(elementName)) {
 
@@ -322,8 +324,32 @@ public class PortletDescriptorParser {
 					else if ("keywords".equals(elementName)) {
 						beanPortlet.addKeywords(elementText);
 					}
+					else if ("listener".equals(elementName)) {
+
+						List<URLGenerationListener> urlGenerationListeners =
+							beanApp.getURLGenerationListeners();
+						urlGenerationListeners.add(urlGenerationListener);
+						urlGenerationListener = null;
+					}
+					else if ("listener-class".equals(elementName)) {
+
+						if (urlGenerationListener != null) {
+							urlGenerationListener.setListenerClass(elementText);
+						}
+					}
 					else if ("mime-type".equals(elementName)) {
 						descriptorSupports.setMimeType(elementText);
+					}
+					else if ("ordinal".equals(elementName)) {
+
+						if (beanFilter != null) {
+							beanFilter.setOrdinal(
+								GetterUtil.getInteger(elementText));
+						}
+						else if (urlGenerationListener != null) {
+							urlGenerationListener.setOrdinal(
+								GetterUtil.getInteger(elementText));
+						}
 					}
 					else if ("name".equals(elementName)) {
 
@@ -334,8 +360,8 @@ public class PortletDescriptorParser {
 						else if (descriptorInitParam != null) {
 							descriptorInitParam.setName(elementText);
 						}
-						else if (descriptorResourceDependency != null) {
-							descriptorResourceDependency.setName(elementText);
+						else if (portletDependency != null) {
+							portletDependency.setName(elementText);
 						}
 						else if (publicRenderParam != null) {
 							publicRenderParam.setName(elementText);
@@ -452,7 +478,7 @@ public class PortletDescriptorParser {
 						descriptorSecurityRoleRef.setRoleName(elementText);
 					}
 					else if ("scope".equals(elementName)) {
-						descriptorResourceDependency.setScope(elementText);
+						portletDependency.setScope(elementText);
 					}
 					else if ("security-role-ref".equals(elementName)) {
 						beanPortlet.addSecurityRoleRef(
@@ -502,7 +528,7 @@ public class PortletDescriptorParser {
 						}
 					}
 					else if ("version".equals(elementName)) {
-						descriptorResourceDependency.setVersion(elementText);
+						portletDependency.setVersion(elementText);
 					}
 					else if ("window-state".equals(elementName)) {
 

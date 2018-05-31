@@ -107,9 +107,15 @@ public class BeanAppAnnotationImpl extends BeanAppBase {
 		return _specVersion;
 	}
 
+	@Override
+	public List<URLGenerationListener> getURLGenerationListeners() {
+		return _urlGenerationListeners;
+	}
+
 	private Map<String, List<String>> _containerRuntimeOptions;
 	private Set<String> _customPortletModes;
 	private List<EventDefinition> _eventDefinitions;
 	private Map<String, PublicRenderParam> _publicRenderParamMap;
 	private String _specVersion;
+	private List<URLGenerationListener> _urlGenerationListeners;
 }

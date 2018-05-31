@@ -75,6 +75,7 @@ import javax.portlet.annotations.PortletApplication;
 import javax.portlet.annotations.PortletConfiguration;
 import javax.portlet.annotations.PortletConfigurations;
 import javax.portlet.annotations.PortletLifecycleFilter;
+import javax.portlet.annotations.PortletListener;
 import javax.portlet.annotations.PortletName;
 import javax.portlet.annotations.PortletRequestScoped;
 import javax.portlet.annotations.PortletSerializable;
@@ -168,6 +169,26 @@ public class BeanPortletExtension implements Extension {
 									annotatedClass.getAnnotation(
 										PortletLifecycleFilter.class)))
 					.collect(Collectors.toList()));
+
+			_portletListenerClasses.stream()
+				.map(
+						portletListenerClass ->
+							new URLGenerationListener(
+								portletListenerClass.getAnnotation(
+										PortletListener.class)
+									.ordinal(), portletListenerClass.getName()))
+				.forEach(
+					urlGenerationListener -> {
+						_beanPortlets.entrySet()
+							.stream()
+							.forEach(
+								entry -> {
+									entry.getValue()
+										.getBeanApp()
+										.getURLGenerationListeners()
+										.add(urlGenerationListener);
+								});
+					});
 
 			URL liferayDescriptorURL = bundle.getEntry(
 				"WEB-INF/liferay-portlet.xml");
@@ -286,6 +307,7 @@ public class BeanPortletExtension implements Extension {
 							RegistrationUtil.registerBeanPortlet(
 								bundleContext, entry.getValue(),
 								servletContext))
+				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 
 		_resourceBundleLoaderRegistrations = _beanPortlets
@@ -296,6 +318,7 @@ public class BeanPortletExtension implements Extension {
 							RegistrationUtil.registerResourceBundleLoader(
 								bundleContext, entry.getValue(),
 								servletContext))
+				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 
 		_beanFilters.forEach(
@@ -433,6 +456,10 @@ public class BeanPortletExtension implements Extension {
 
 		if (annotationClasses.contains(PortletLifecycleFilter.class)) {
 			_portletLifecycleFilterClasses.add(annotatedClass);
+		}
+
+		if (annotationClasses.contains(PortletListener.class)) {
+			_portletListenerClasses.add(annotatedClass);
 		}
 
 		if (annotationClasses.contains(LiferayPortletConfigurations.class)) {
@@ -804,6 +831,7 @@ public class BeanPortletExtension implements Extension {
 	private List<Class<?>> _portletConfigurationClasses = new ArrayList<>();
 	private List<Class<?>> _portletConfigurationsClasses = new ArrayList<>();
 	private List<Class<?>> _portletLifecycleFilterClasses = new ArrayList<>();
+	private List<Class<?>> _portletListenerClasses = new ArrayList<>();
 	private List<ScannedMethod> _renderMethods = new ArrayList<>();
 	private List<ServiceRegistration<ResourceBundleLoader>> _resourceBundleLoaderRegistrations =
 		new ArrayList<>();

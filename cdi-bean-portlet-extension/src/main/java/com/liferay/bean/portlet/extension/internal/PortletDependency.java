@@ -14,14 +14,73 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
+
 /**
  * @author Neil Griffin
  */
-public interface PortletDependency {
+public class PortletDependency {
 
-	String getName();
+	public PortletDependency() {
+		this(null, null, null);
+	}
 
-	String getScope();
+	public PortletDependency(String name, String scope, String version) {
+		_name = name;
+		_scope = scope;
+		_version = version;
+	}
 
-	String getVersion();
+	public String getName() {
+		return _name;
+	}
+
+	public String getScope() {
+		return _scope;
+	}
+
+	public String getVersion() {
+		return _version;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public void setScope(String scope) {
+		_scope = scope;
+	}
+
+	public void setVersion(String version) {
+		_version = version;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBundler sb = new StringBundler();
+
+		if (_name != null) {
+			sb.append(_name);
+		}
+
+		sb.append(CharPool.SEMICOLON);
+
+		if (_scope != null) {
+			sb.append(_scope);
+		}
+
+		sb.append(CharPool.SEMICOLON);
+
+		if (_version != null) {
+			sb.append(_version);
+		}
+
+		return sb.toString();
+	}
+
+	private String _name;
+	private String _scope;
+	private String _version;
 }

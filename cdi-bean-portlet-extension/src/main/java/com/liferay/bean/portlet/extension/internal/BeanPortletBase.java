@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -173,6 +174,15 @@ public abstract class BeanPortletBase implements BeanPortlet {
 			"javax.portlet.dependency",
 			getPortletDependencies().stream()
 				.map(Object::toString)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList()));
+
+		portletDictionary.putIfNotEmpty(
+			"javax.portlet.listener",
+			_beanApp.getURLGenerationListeners()
+				.stream()
+				.map(Object::toString)
+				.filter(Objects::nonNull)
 				.collect(Collectors.toList()));
 
 		portletDictionary.putIfNotNull("javax.portlet.name", portletId);

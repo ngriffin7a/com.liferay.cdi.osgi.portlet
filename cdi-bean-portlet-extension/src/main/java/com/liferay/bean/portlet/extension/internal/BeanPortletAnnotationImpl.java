@@ -70,7 +70,7 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			.forEach(
 				dependency ->
 					addPortletDependency(
-						new PortletDependencyImpl(
+						new PortletDependency(
 							dependency.name(), dependency.scope(),
 							dependency.version())));
 	}
