@@ -14,8 +14,12 @@
 
 package com.liferay.bean.portlet.extension.internal;
 
+import com.liferay.portal.kernel.portlet.LiferayPortletMode;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.portlet.PortletMode;
 import javax.portlet.annotations.ActionMethod;
 import javax.portlet.annotations.EventMethod;
 
@@ -308,6 +313,29 @@ public abstract class BeanPortletBase implements BeanPortlet {
 		}
 
 		return namespaceURI;
+	}
+
+	protected Set<String> getLiferayPortletModes() {
+		return _liferayPortletModes;
+	}
+
+	private static final Set<String> _liferayPortletModes = new HashSet<>();
+
+	static {
+		try {
+			for (Field field : LiferayPortletMode.class.getFields()) {
+				if (Modifier.isStatic(field.getModifiers()) &&
+					(field.getType() == PortletMode.class)) {
+
+					PortletMode portletMode = (PortletMode)field.get(null);
+
+					_liferayPortletModes.add(portletMode.toString());
+				}
+			}
+		}
+		catch (IllegalAccessException iae) {
+			throw new ExceptionInInitializerError(iae);
+		}
 	}
 
 	private List<BeanMethod> _actionMethods = Collections.emptyList();
