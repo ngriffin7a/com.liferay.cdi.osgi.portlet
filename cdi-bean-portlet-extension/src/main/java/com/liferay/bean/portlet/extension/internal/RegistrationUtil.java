@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +33,7 @@ import javax.portlet.filter.PortletFilter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
+import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -81,8 +81,9 @@ public class RegistrationUtil {
 					beanFilter.toDictionary(portletName)));
 		}
 
-		List<String> beanFilterNames = (List<String>) servletContext.getAttribute(
-			"com.liferay.beanFilterNames");
+		List<String> beanFilterNames =
+			(List<String>)servletContext.getAttribute(
+				WebKeys.BEAN_FILTER_NAMES);
 
 		if (beanFilterNames == null) {
 			beanFilterNames = new ArrayList<>();
@@ -91,7 +92,7 @@ public class RegistrationUtil {
 		beanFilterNames.add(beanFilter.getFilterName());
 
 		servletContext.setAttribute(
-			"com.liferay.beanFilterNames", beanFilterNames);
+			WebKeys.BEAN_FILTER_NAMES, beanFilterNames);
 
 		return registrations;
 	}
@@ -132,8 +133,9 @@ public class RegistrationUtil {
 
 				servletRegistration.addMapping("/portlet-servlet/*");
 
-				List<String> beanPortletIds = (List<String>)
-					servletContext.getAttribute("com.liferay.beanPortletIds");
+				List<String> beanPortletIds =
+					(List<String>)servletContext.getAttribute(
+						WebKeys.BEAN_PORTLET_IDS);
 
 				if (beanPortletIds == null) {
 					beanPortletIds = new ArrayList<>();
@@ -142,7 +144,7 @@ public class RegistrationUtil {
 				beanPortletIds.add(portletId);
 
 				servletContext.setAttribute(
-					"com.liferay.beanPortletIds", beanPortletIds);
+					WebKeys.BEAN_PORTLET_IDS, beanPortletIds);
 			}
 
 			return portletServiceRegistration;
