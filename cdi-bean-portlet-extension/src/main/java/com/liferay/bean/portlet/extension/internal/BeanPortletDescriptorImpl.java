@@ -225,14 +225,11 @@ public class BeanPortletDescriptorImpl extends BeanPortletBase {
 		containerRuntimeOptions.putAll(_containerRuntimeOptions);
 
 		containerRuntimeOptions.entrySet()
-			.stream()
 			.forEach(
-				entry -> {
-					portletDictionary.put(
-						"javax.portlet.container-runtime-option.".concat(
-							entry.getKey()),
-						entry.getValue());
-				});
+				entry -> portletDictionary.put(
+					"javax.portlet.container-runtime-option.".concat(
+						entry.getKey()),
+					entry.getValue()));
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache", _expirationCache);

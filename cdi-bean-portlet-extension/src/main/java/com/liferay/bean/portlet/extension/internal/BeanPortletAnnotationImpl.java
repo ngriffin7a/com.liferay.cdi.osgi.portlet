@@ -111,14 +111,11 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 						Arrays.asList(runtimeOption.values())));
 
 		containerRuntimeOptions.entrySet()
-			.stream()
 			.forEach(
-				entry -> {
-					portletDictionary.put(
-						"javax.portlet.container-runtime-option.".concat(
-							entry.getKey()),
-						entry.getValue());
-				});
+				entry -> portletDictionary.put(
+					"javax.portlet.container-runtime-option.".concat(
+						entry.getKey()),
+					entry.getValue()));
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache",
