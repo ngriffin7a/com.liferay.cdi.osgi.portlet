@@ -23,6 +23,7 @@
 		<module>cdi-bean-portlet-extension</module>
 		<module>demo1-cdi-bean-portlet</module>
 		<module>demo2-generic-portlet</module>
+		<module>demo3-cdi-url-listener-portlet</module>
 	</modules>
 
 	<build>

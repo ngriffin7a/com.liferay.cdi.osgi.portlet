@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+		  xmlns:portlet="http://xmlns.jcp.org/portlet_3_0"
+		  version="2.1">
+
+	<jsp:directive.page contentType="text/html" pageEncoding="UTF-8" />
+	<portlet:defineObjects />
+
+	<portlet:actionURL copyCurrentRenderParameters="false" var="myActionURL">
+		<portlet:param name="urlToBeConcernedWith" value="true" />
+		<portlet:param name="a" value="success_No_Listener" />
+		<portlet:param name="b" value="fail_No_Listener" />
+		<portlet:param name="c" value="fail_No_Listener" />
+		<portlet:param name="d" value="fail_No_Listener" />
+	</portlet:actionURL>
+
+	<form method="post" action="${myActionURL}">
+		<input type="submit"></input>
+	</form>
+
+	<table border="1">
+		<thead>
+		<tr>
+			<th>Param Name</th>
+			<th>Expected Value</th>
+			<th>Actual Value</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>a</td>
+			<td>success_No_Listener</td>
+			<td>${renderRequest.parameterMap['a'][0]}</td>
+		</tr>
+		<tr>
+			<td>b</td>
+			<td>success_ListenerY</td>
+			<td>${renderRequest.parameterMap['b'][0]}</td>
+		</tr>
+		<tr>
+			<td>c</td>
+			<td>success_ListenerZ</td>
+			<td>${renderRequest.parameterMap['c'][0]}</td>
+		</tr>
+		<tr>
+			<td>d</td>
+			<td>success_ListenerX</td>
+			<td>${renderRequest.parameterMap['d'][0]}</td>
+		</tr>
+		</tbody>
+	</table>
+
+</jsp:root>
