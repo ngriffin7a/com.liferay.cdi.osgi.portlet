@@ -16,7 +16,6 @@ package com.liferay.bean.portlet.extension.internal;
 
 import com.liferay.bean.portlet.extension.LiferayPortletConfiguration;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -111,22 +110,15 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 						runtimeOption.name(),
 						Arrays.asList(runtimeOption.values())));
 
-		portletDictionary.putIfNotEmpty(
-			"javax.portlet.container-runtime-option",
-			containerRuntimeOptions.entrySet()
-				.stream()
-				.map(
-						entry ->
-							entry.getValue()
-								.stream()
-								.map(
-										value ->
-											PortletDictionaryUtil
-												.formatNameValuePair(
-													entry.getKey(), value))
-								.collect(Collectors.toList()))
-				.flatMap(Collection::stream)
-				.collect(Collectors.toList()));
+		containerRuntimeOptions.entrySet()
+			.stream()
+			.forEach(
+				entry -> {
+					portletDictionary.put(
+						"javax.portlet.container-runtime-option.".concat(
+							entry.getKey()),
+						entry.getValue());
+				});
 
 		portletDictionary.put(
 			"javax.portlet.expiration-cache",
