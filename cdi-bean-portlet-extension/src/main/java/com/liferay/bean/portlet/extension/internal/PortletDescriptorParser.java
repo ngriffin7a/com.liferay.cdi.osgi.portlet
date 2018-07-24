@@ -63,7 +63,6 @@ public class PortletDescriptorParser {
 		String customPortletMode = null;
 		boolean customPortletModePortalManaged = true;
 
-		// String customWindowState = null;
 		DescriptorContainerRuntimeOption descriptorContainerRuntimeOption =
 			null;
 		DescriptorFilterMapping descriptorFilterMapping = null;
@@ -201,19 +200,6 @@ public class PortletDescriptorParser {
 						customPortletMode = null;
 						customPortletModePortalManaged = true;
 					}
-
-					//J-
-					/*
-					else if ("custom-window-state".equals(elementName)) {
-
-						if (customWindowState != null) {
-
-							// beanPortlet.addCustomWindowState(customWindowState);
-							customWindowState = null;
-						}
-					}
-					*/
-					//J+
 					else if ("default-namespace".equals(elementName)) {
 						beanApp.setDefaultNamespace(elementText);
 					}
@@ -535,13 +521,6 @@ public class PortletDescriptorParser {
 						if (descriptorSupports != null) {
 							descriptorSupports.addWindowState(elementText);
 						}
-						//J-
-						/*
-						else {
-							customWindowState = elementText;
-						}
-						*/
-						//J+
 					}
 				}
 			}
