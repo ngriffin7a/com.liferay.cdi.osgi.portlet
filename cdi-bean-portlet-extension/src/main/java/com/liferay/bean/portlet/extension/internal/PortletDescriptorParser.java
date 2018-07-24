@@ -403,13 +403,9 @@ public class PortletDescriptorParser {
 						if (descriptorSupports != null) {
 							descriptorSupports.addPortletMode(elementText);
 						}
-						//J-
-						/*
 						else {
 							customPortletMode = elementText;
 						}
-						*/
-						//J+
 					}
 					else if ("preference".equals(elementName)) {
 						beanPortlet.addPreference(descriptorPreference);

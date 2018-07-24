@@ -149,9 +149,8 @@ public class BeanPortletAnnotationImpl extends BeanPortletBase {
 			"javax.portlet.info.title",
 			getEnglishText(_portletConfiguration.title()), getPortletName());
 
-		Set<String> customPortletModes = beanApp.getCustomPortletModes();
 		Set<String> supportedPortletModes = new HashSet<>(getLiferayPortletModes());
-		supportedPortletModes.addAll(customPortletModes);
+		supportedPortletModes.addAll(beanApp.getCustomPortletModes());
 
 		portletDictionary.putIfNotEmpty(
 			"javax.portlet.portlet-mode",
