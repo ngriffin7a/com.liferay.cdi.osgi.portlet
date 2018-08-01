@@ -107,11 +107,12 @@ public class BeanPortletExtension implements Extension {
 			@Observes AfterBeanDiscovery afterBeanDiscovery) {
 
 		try {
-			BundleContext bundleContext = FrameworkUtil.getBundle(
-					BeanPortletExtension.class)
-					.getBundleContext();
 
-			Bundle bundle = bundleContext.getBundle();
+			// TODO - This could be broken. You did a little refactor here
+			// in order to get the bundle but if it stops working that means
+			// you need to revert to the old way prior to bchanitization.
+
+			Bundle bundle = FrameworkUtil.getBundle(BeanPortletExtension.class);
 
 			URL portletDescriptorURL = bundle.getEntry("/WEB-INF/portlet.xml");
 
@@ -206,13 +207,6 @@ public class BeanPortletExtension implements Extension {
 									!_beanPortlets.containsKey(portletName))
 						.forEach(
 							portletName -> {
-								_log.warn(
-									StringBundler.concat(
-										"Portlet with the name ", portletName,
-										" is described in liferay-portlet.xml",
-										" but does not have a matching entry ",
-										" in portlet.xml or ",
-										" @PortletConfiguration annotation"));
 								_beanPortlets.put(
 									portletName,
 									new BeanPortletDefaultImpl(portletName));
@@ -245,21 +239,8 @@ public class BeanPortletExtension implements Extension {
 					categoryMap.entrySet()
 						.stream()
 						.filter(
-								entry -> {
-
-									if (_beanPortlets.containsKey(
-											entry.getKey())) {
-										return true;
-									}
-									else {
-										_log.error(
-											"Unknown portletId " +
-											entry.getKey() +
-											" found in liferay-display.xml");
-
-										return false;
-									}
-								})
+							entry -> _beanPortlets.containsKey(entry.getKey())
+						)
 						.forEach(
 							entry ->
 								_beanPortlets.get(entry.getKey())
@@ -331,6 +312,65 @@ public class BeanPortletExtension implements Extension {
 									bundleContext, portletName,
 									_beanPortlets.keySet(), beanFilter,
 									beanManager, servletContext))));
+
+		Bundle bundle = FrameworkUtil.getBundle(BeanPortletExtension.class);
+
+		URL liferayDescriptorURL = bundle.getEntry(
+			"WEB-INF/liferay-portlet.xml");
+
+		if (liferayDescriptorURL != null) {
+
+			try {
+				LiferayDescriptor liferayDescriptor =
+					LiferayDescriptorParser.parse(liferayDescriptorURL);
+
+				liferayDescriptor.getPortletNames()
+					.stream()
+					.filter(
+						portletName ->
+							!_beanPortlets.containsKey(portletName))
+					.forEach(
+						portletName -> {
+							_log.warn(
+								StringBundler.concat(
+									"Portlet with the name ", portletName,
+									" is described in liferay-portlet.xml",
+									" but does not have a matching entry ",
+									" in portlet.xml or ",
+									" @PortletConfiguration annotation"));
+						});
+			}
+			catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
+		}
+
+		URL displayDescriptorURL = bundle.getEntry(
+			"WEB-INF/liferay-display.xml");
+
+		if (displayDescriptorURL != null) {
+
+			try {
+				Map<String, String> categoryMap = DisplayDescriptorParser
+					.parse(displayDescriptorURL);
+
+				categoryMap.entrySet()
+					.stream()
+					.filter(
+						entry -> !_beanPortlets.containsKey(entry.getKey())
+					)
+					.forEach(
+						entry ->
+							_log.error(
+								"Unknown portletId " +
+									entry.getKey() +
+									" found in liferay-display.xml")
+						);
+			}
+			catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
+		}
 
 		_log.info(
 			"Discovered {} bean portlets and {} bean filters for {}",
